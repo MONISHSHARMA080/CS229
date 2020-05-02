@@ -172,7 +172,15 @@ def get_top_five_naive_bayes_words(model, dictionary):
     Returns: A list of the top five most indicative words in sorted order with the most indicative first
     """
     # *** START CODE HERE ***
-
+    indicative = (model.phi_pos / model.phi_neg).reshape(model.phi_pos.shape[1])
+    top_five_index = indicative.argsort()[-5:][::-1]
+    # Find top five words by finding the keys from values in dictionary
+    top_five_words = [None] * 5
+    for key, value in dictionary.items():
+        if value in top_five_index:
+            rank = np.where(top_five_index == value)[0][0]
+            top_five_words[rank] = key
+    return top_five_words
     # *** END CODE HERE ***
 
 
@@ -184,7 +192,7 @@ def compute_best_svm_radius(train_matrix, train_labels, val_matrix, val_labels, 
 
     Args:
         train_matrix: The word counts for the training data
-        train_labels: The spma or not spam labels for the training data
+        train_labels: The spam or not spam labels for the training data
         val_matrix: The word counts for the validation data
         val_labels: The spam or not spam labels for the validation data
         radius_to_consider: The radius values to consider
@@ -193,6 +201,12 @@ def compute_best_svm_radius(train_matrix, train_labels, val_matrix, val_labels, 
         The best radius which maximizes SVM accuracy.
     """
     # *** START CODE HERE ***
+    accuracy_list = [None] * len(radius_to_consider)
+    for i in range(len(radius_to_consider)):
+        predicts = svm.train_and_predict_svm(train_matrix, train_labels, val_matrix, radius_to_consider[i])
+        accuracy_list[i] = np.mean(predicts==val_labels)
+    best_index = accuracy_list.index(max(accuracy_list))
+    return radius_to_consider[best_index]
     # *** END CODE HERE ***
 
 
