@@ -2,13 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c3749a3f-c8b1-4f77-87df-0b7225e806aa" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/R_User_Library.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/src.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/src.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spam/spam_naive_bayes_predictions" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spam/spam_optimal_radius" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/spam/spam_top_indicative_words" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam.py" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_dictionary" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_dictionary" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_sample_train_matrix" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_sample_train_matrix" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -20,13 +17,16 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../.." />
   </component>
   <component name="ProjectId" id="1bGnVYEAEzvYQj9vvZR1Es7tI0J" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showExcludedFiles" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
   <component name="PropertiesComponent">
+    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
@@ -109,12 +109,30 @@
       <updated>1588267321513</updated>
       <workItem from="1588267333320" duration="8625000" />
       <workItem from="1588354535378" duration="3861000" />
-      <workItem from="1588391681648" duration="4692000" />
+      <workItem from="1588391681648" duration="4988000" />
     </task>
+    <task id="LOCAL-00001" summary="add from mac">
+      <created>1588441354536</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1588441354536</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.History.Properties">
+    <option name="COLUMN_ORDER">
+      <list>
+        <option value="0" />
+        <option value="2" />
+        <option value="3" />
+        <option value="1" />
+      </list>
+    </option>
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
@@ -126,6 +144,11 @@
         </entry>
       </map>
     </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="add from mac" />
+    <option name="LAST_COMMIT_MESSAGE" value="add from mac" />
   </component>
   <component name="WindowStateProjectService">
     <state x="552" y="181" key="#Notifications" timestamp="1588270993974">
