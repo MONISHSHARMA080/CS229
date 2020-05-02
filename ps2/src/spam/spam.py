@@ -116,6 +116,23 @@ def fit_naive_bayes_model(matrix, labels):
 
     # *** START CODE HERE ***
     class naiveBayes():
+<<<<<<< HEAD
+        def __init__(self):
+            self.phi_pos = None
+            self.phi_neg = None
+            self.prob_pos = None
+        def fit(self, matrix, labels):
+            # Calculate phi_j
+            spam_count = matrix * labels.reshape(labels.shape[0], 1)
+            self.phi_pos = (np.sum(spam_count, axis=0, keepdims=True) + 1) /(np.sum(labels) + 2)
+            nonspam_count = matrix * labels.reshape((labels==0).shape[0], 1)
+            self.phi_neg = (np.sum(nonspam_count, axis=0, keepdims=True) + 1) /(np.sum(labels==0) + 2)
+            # Calculate probability of positive as a whole
+            self.prob_pos = np.mean(labels)
+    naiveBayesModel = naiveBayes()
+    naiveBayesModel.fit(matrix, labels)
+    return naiveBayesModel
+=======
 
     # Calculate phi_j
     spam_count = matrix * labels.reshape(labels.shape[0], 1)
@@ -125,6 +142,7 @@ def fit_naive_bayes_model(matrix, labels):
     # The model is generated so that the first column is spam phi, and the second column is non spam phi
     state = np.transpose(np.append(phi_spam ,phi_nonspam, axis=0))
     return state
+>>>>>>> 5a49e619649dfb69274934db7cc018268a316e99
     # *** END CODE HERE ***
 
 
@@ -141,7 +159,14 @@ def predict_from_naive_bayes_model(model, matrix):
     Returns: A numpy array containing the predictions from the model
     """
     # *** START CODE HERE ***
+<<<<<<< HEAD
+    exist_matrix = (matrix > 0).astype('int')
+    # For more stable output, use log instead of prod
+    neg_score = np.log(np.dot(exist_matrix, np.transpose(model.phi_neg))) + np.log(1 - model.prob_pos)
+    pos_score = np.log(np.dot(exist_matrix, np.transpose(model.phi_pos))) + np.log(model.prob_pos)
+=======
     np.dot(matrix, model)
+>>>>>>> 5a49e619649dfb69274934db7cc018268a316e99
     # *** END CODE HERE ***
 
 
