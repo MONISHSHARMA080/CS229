@@ -1,0 +1,14 @@
+<component name="libraryTable">
+  <library name="Google App Engine SDK" type="python">
+    <CLASSES>
+      <root url="file://G:/Applications/google-cloud-sdk" />
+      <root url="file://G:/Applications/google-cloud-sdk/lib/gcloud.py" />
+      <root url="file://G:/Applications/google-cloud-sdk/lib/gcloud.pyc" />
+      <root url="file://G:/Applications/google-cloud-sdk/lib/googlecloudsdk" />
+      <root url="file://G:/Applications/google-cloud-sdk/lib/surface" />
+      <root url="file://G:/Applications/google-cloud-sdk/lib/third_party" />
+      <root url="file://G:/Applications/google-cloud-sdk/lib/tools" />
+    </CLASSES>
+    <SOURCES />
+  </library>
+</component>

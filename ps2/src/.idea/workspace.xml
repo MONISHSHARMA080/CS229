@@ -2,12 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="c3749a3f-c8b1-4f77-87df-0b7225e806aa" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/deployment.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/Google_App_Engine_SDK.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/src.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/src.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam.py" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_dictionary" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_dictionary" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_optimal_radius" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_optimal_radius" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_sample_train_matrix" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_sample_train_matrix" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_top_indicative_words" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_top_indicative_words" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -32,7 +30,7 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="settings.editor.selected.configurable" value="editor.preferences.completion" />
+    <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
   </component>
   <component name="RunManager" selected="Python.spam">
     <configuration name="spam" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
@@ -99,7 +97,9 @@
       <workItem from="1588267333320" duration="8625000" />
       <workItem from="1588354535378" duration="3861000" />
       <workItem from="1588391681648" duration="4988000" />
-      <workItem from="1588442000947" duration="2268000" />
+      <workItem from="1588442000947" duration="3058000" />
+      <workItem from="1588523753262" duration="3803000" />
+      <workItem from="1588543588580" duration="3961000" />
     </task>
     <task id="LOCAL-00001" summary="add from mac">
       <created>1588441354536</created>
@@ -108,7 +108,14 @@
       <option name="project" value="LOCAL" />
       <updated>1588441354536</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="add from win">
+      <created>1588445394082</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1588445394082</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -140,57 +147,78 @@
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="add from mac" />
-    <option name="LAST_COMMIT_MESSAGE" value="add from mac" />
+    <MESSAGE value="add from win" />
+    <option name="LAST_COMMIT_MESSAGE" value="add from win" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="1062" y="276" key="#Deployment" timestamp="1588546815549">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1062" y="276" key="#Deployment/0.0.1920.1040@0.0.1920.1040" timestamp="1588546815549" />
     <state x="552" y="181" key="#Notifications" timestamp="1588270993974">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="552" y="181" key="#Notifications/0.0.1920.1040@0.0.1920.1040" timestamp="1588270993974" />
-    <state x="739" y="297" key="FileChooserDialogImpl" timestamp="1588267397991">
+    <state x="860" y="383" key="#com.intellij.tools.ToolEditorDialog" timestamp="1588545677110">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="739" y="297" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1588267397991" />
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1588445291003">
+    <state x="860" y="383" key="#com.intellij.tools.ToolEditorDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588545677110" />
+    <state x="598" y="118" key="CommitChangelistDialog2" timestamp="1588445391844">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1588445291003">
+    <state x="598" y="118" key="CommitChangelistDialog2/0.0.1920.1040@0.0.1920.1040" timestamp="1588445391844" />
+    <state x="739" y="297" key="FileChooserDialogImpl" timestamp="1588548022069">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1588445291003">
+    <state x="739" y="297" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1588548022069" />
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1588445291003">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.1.bottom" timestamp="1588445290867">
+    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290867" />
-    <state width="1877" height="338" key="GridCell.Tab.1.center" timestamp="1588445290867">
+    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290867" />
-    <state width="1877" height="338" key="GridCell.Tab.1.left" timestamp="1588445290866">
+    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.1.bottom" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290866" />
-    <state width="1877" height="338" key="GridCell.Tab.1.right" timestamp="1588445290867">
+    <state width="1877" height="338" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.1.center" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290867" />
-    <state x="463" y="165" key="SettingsEditor" timestamp="1588267448673">
+    <state width="1877" height="338" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.1.left" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="463" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1588267448673" />
-    <state x="668" y="347" key="com.intellij.ide.util.TipDialog" timestamp="1588374200282">
+    <state width="1877" height="338" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state width="1877" height="338" key="GridCell.Tab.1.right" timestamp="1588461462494">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state x="668" y="347" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588374200282" />
+    <state width="1877" height="338" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588461462494" />
+    <state x="746" y="258" key="SettingsEditor" timestamp="1588548131993">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="746" y="258" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1588548131993" />
+    <state x="552" y="256" key="Vcs.Push.Dialog.v2" timestamp="1588445403384">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="552" y="256" key="Vcs.Push.Dialog.v2/0.0.1920.1040@0.0.1920.1040" timestamp="1588445403384" />
+    <state x="668" y="347" key="com.intellij.ide.util.TipDialog" timestamp="1588543588613">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="668" y="347" key="com.intellij.ide.util.TipDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1588543588613" />
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup" timestamp="1588541851900">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="1103" y="230" width="672" height="678" key="search.everywhere.popup/0.0.1920.1040@0.0.1920.1040" timestamp="1588541851900" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
