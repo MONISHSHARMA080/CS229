@@ -26,10 +26,23 @@ def ridge_regression(train_path, validation_path):
     """
     # *** START CODE HERE ***
     # Load data sets
-    train_set = util.load_dataset(train_path)
-    val_set = util.load_dataset(validation_path)
+    train_x, train_y = util.load_dataset(train_path)
+    val_x, val_y = util.load_dataset(validation_path)
+    # Elements to calculate theta_MAP
+    # X^T X
+    matrix_a  = np.dot(train_x, np.transpose(train_x))
+    # I
+    matrix_i = np.identity(matrix_a.shape[0])
     # Set penalty
-
+    lambd = sigma**2 / (eta**2)
+    val_err = []
+    for scale in scale_list:
+        penalty = lambd * scale
+        # matrix_mid = (XX_T + sigma^2/(eta^2+I))^-1
+        matrix_mid = np.linalg.pinv(matrix_a + penalty * matrix_i)
+        theta = np.dot(np.dot(np.transpose(train_x), matrix_mid), train_y)
+        val_mse = np.mean((np.dot(val_x, theta) - val_y) ** 2)
+        val_err += [val_mse]
     # *** END CODE HERE
     return val_err
 
