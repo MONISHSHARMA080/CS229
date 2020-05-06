@@ -25,6 +25,11 @@ def ridge_regression(train_path, validation_path):
         val_err: List of validation errors for different scaling factors of lambda in scale_list.
     """
     # *** START CODE HERE ***
+    # Load data sets
+    train_set = util.load_dataset(train_path)
+    val_set = util.load_dataset(validation_path)
+    # Set penalty
+
     # *** END CODE HERE
     return val_err
 
