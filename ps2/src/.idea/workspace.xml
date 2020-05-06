@@ -1,14 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="c3749a3f-c8b1-4f77-87df-0b7225e806aa" name="Default Changelist" comment="">
+    <list default="true" id="c3749a3f-c8b1-4f77-87df-0b7225e806aa" name="Default Changelist" comment="add from mac">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam.py" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_dictionary" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_dictionary" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_optimal_radius" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_optimal_radius" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_sample_train_matrix" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_sample_train_matrix" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/spam/spam_top_indicative_words" beforeDir="false" afterPath="$PROJECT_DIR$/spam/spam_top_indicative_words" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/bayesianreg/doubledescent.py" beforeDir="false" afterPath="$PROJECT_DIR$/bayesianreg/doubledescent.py" afterDir="false" />
     </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -34,7 +31,41 @@
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="settings.editor.selected.configurable" value="editor.preferences.completion" />
   </component>
-  <component name="RunManager" selected="Python.spam">
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Python.doubledescent">
+    <configuration name="doubledescent" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="src" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/bayesianreg" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/bayesianreg/doubledescent.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <configuration name="spam" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="src" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -81,6 +112,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.doubledescent" />
         <item itemvalue="Python.spam" />
         <item itemvalue="Python.stability" />
       </list>
@@ -99,7 +131,7 @@
       <workItem from="1588267333320" duration="8625000" />
       <workItem from="1588354535378" duration="3861000" />
       <workItem from="1588391681648" duration="4988000" />
-      <workItem from="1588442000947" duration="2268000" />
+      <workItem from="1588737344692" duration="2549000" />
     </task>
     <task id="LOCAL-00001" summary="add from mac">
       <created>1588441354536</created>
@@ -151,38 +183,38 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="739" y="297" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1588267397991" />
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1588445291003">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom" timestamp="1588355195492">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1588445291003">
+    <state width="1877" height="338" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195492" />
+    <state width="1877" height="338" key="GridCell.Tab.0.center" timestamp="1588355195492">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1588445291003">
+    <state width="1877" height="338" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195492" />
+    <state width="1877" height="338" key="GridCell.Tab.0.left" timestamp="1588355195492">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1588445291003">
+    <state width="1877" height="338" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195492" />
+    <state width="1877" height="338" key="GridCell.Tab.0.right" timestamp="1588355195492">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588445291003" />
-    <state width="1877" height="338" key="GridCell.Tab.1.bottom" timestamp="1588445290867">
+    <state width="1877" height="338" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195492" />
+    <state width="1877" height="338" key="GridCell.Tab.1.bottom" timestamp="1588355195493">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290867" />
-    <state width="1877" height="338" key="GridCell.Tab.1.center" timestamp="1588445290867">
+    <state width="1877" height="338" key="GridCell.Tab.1.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195493" />
+    <state width="1877" height="338" key="GridCell.Tab.1.center" timestamp="1588355195493">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290867" />
-    <state width="1877" height="338" key="GridCell.Tab.1.left" timestamp="1588445290866">
+    <state width="1877" height="338" key="GridCell.Tab.1.center/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195493" />
+    <state width="1877" height="338" key="GridCell.Tab.1.left" timestamp="1588355195493">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290866" />
-    <state width="1877" height="338" key="GridCell.Tab.1.right" timestamp="1588445290867">
+    <state width="1877" height="338" key="GridCell.Tab.1.left/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195493" />
+    <state width="1877" height="338" key="GridCell.Tab.1.right" timestamp="1588355195493">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1877" height="338" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588445290867" />
+    <state width="1877" height="338" key="GridCell.Tab.1.right/0.0.1920.1040@0.0.1920.1040" timestamp="1588355195493" />
     <state x="463" y="165" key="SettingsEditor" timestamp="1588267448673">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
@@ -210,6 +242,11 @@
           <line>49</line>
           <option name="timeStamp" value="14" />
         </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/bayesianreg/doubledescent.py</url>
+          <line>29</line>
+          <option name="timeStamp" value="19" />
+        </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
         <breakpoint type="python-exception">
@@ -221,7 +258,8 @@
     </breakpoint-manager>
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/src$spam.coverage" NAME="spam Coverage Results" MODIFIED="1588445290821" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/spam" />
+    <SUITE FILE_PATH="coverage/src$doubledescent.coverage" NAME="doubledescent Coverage Results" MODIFIED="1588739150935" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/bayesianreg" />
     <SUITE FILE_PATH="coverage/src$stability.coverage" NAME="stability Coverage Results" MODIFIED="1588282521652" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/stability" />
+    <SUITE FILE_PATH="coverage/src$spam.coverage" NAME="spam Coverage Results" MODIFIED="1588441166711" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/spam" />
   </component>
 </project>
