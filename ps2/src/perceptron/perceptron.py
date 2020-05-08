@@ -16,6 +16,8 @@ def initial_state():
     """
 
     # *** START CODE HERE ***
+    # Return an empty state
+    return []
     # *** END CODE HERE ***
 
 
@@ -33,8 +35,11 @@ def predict(state, kernel, x_i):
         Returns the prediction (i.e 0 or 1)
     """
     # *** START CODE HERE ***
+    sum = 0
+    for x_prev, beta in state:
+        sum += beta * kernel(x_prev, x_i)
+    return sign(sum)
     # *** END CODE HERE ***
-
 
 def update_state(state, kernel, learning_rate, x_i, y_i):
     """Updates the state of the perceptron.
@@ -47,6 +52,10 @@ def update_state(state, kernel, learning_rate, x_i, y_i):
         y_i: A 0 or 1 indicating the label for a single instance
     """
     # *** START CODE HERE ***
+    h_x = predict(state, kernel, x_i)
+    beta = learning_rate * (y_i - h_x)
+    state += [(x_i, beta)]
+    return state
     # *** END CODE HERE ***
 
 
