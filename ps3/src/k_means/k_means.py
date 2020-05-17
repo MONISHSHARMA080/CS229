@@ -26,7 +26,7 @@ def init_centroids(num_clusters, image):
     """
 
     # *** START YOUR CODE ***
-    centroids_init = (np.random.randn((num_clusters, image.shape[-1])) * 255)
+    centroids_init = (np.random.uniform(size = (num_clusters, image.shape[-1])) * 255).astype('int')
     # *** END YOUR CODE ***
 
     return centroids_init
@@ -54,14 +54,35 @@ def update_centroids(centroids, image, max_iter=30, print_every=10):
     """
 
     # *** START YOUR CODE ***
-    # raise NotImplementedError('update_centroids function not implemented')
-        # Usually expected to converge long before `max_iter` iterations
-                # Initialize `dist` vector to keep track of distance to every centroid
-                # Loop over all centroids and store distances in `dist`
-                # Find closest centroid and update `new_centroids`
+    # Usually expected to converge long before `max_iter` iterations
+    # Initialize `dist` vector to keep track of distance to every centroid
+    new_centroids = centroids.astype('float')
+    dist = np.zeros((image.shape[0], image.shape[1], len(centroids)))
+    # Loop over all centroids and store distances in `dist`
+    def getDist(image, centroid):
+        return np.sqrt(np.sum((image - centroid)**2, axis = -1))
+    for num in range(max_iter):
+        position_change = 0
+        for i in range(len(centroids)):
+            centroid = new_centroids[i]
+            dist[:, :, i] = (getDist(image, centroid))
+        # Find closest centroid and update `new_centroids`
+        closest_centroid = dist.argmin(axis=-1)
         # Update `new_centroids`
+        for i in range(len(centroids)):
+            mask = (closest_centroid == i)
+            closest_points = image[mask, :]
+            if len(closest_points) != 0:
+                new_centroid = np.mean(closest_points, axis=0)
+                position_change += np.sqrt(np.sum((new_centroid - new_centroids[i])**2))
+                new_centroids[i] = new_centroid
+        # Convergence
+        if position_change <= 5:
+            print('Algorithm converged.')
+            break
+        if num % print_every == 0:
+            print('In iteration {}, the positions of centroids changed by {}'.format(num, position_change))
     # *** END YOUR CODE ***
-
     return new_centroids
 
 
@@ -84,10 +105,19 @@ def update_image(image, centroids):
     """
 
     # *** START YOUR CODE ***
-    # raise NotImplementedError('update_image function not implemented')
-            # Initialize `dist` vector to keep track of distance to every centroid
-            # Loop over all centroids and store distances in `dist`
-            # Find closest centroid and update pixel value in `image`
+    # Initialize `dist` vector to keep track of distance to every centroid
+    dist = np.zeros((image.shape[0], image.shape[1], centroids.shape[0]))
+    # Loop over all centroids and store distances in `dist`
+    def getDist(image, centroid):
+        return np.sqrt(np.sum((image - centroid)**2, axis = -1))
+    for i in range(centroids.shape[0]):
+        centroid = centroids[i]
+        dist[:, :, i] = (getDist(image, centroid))
+    # Find closest centroid and update pixel value in `image`
+    closest_centroid = dist.argmin(axis=-1)
+    for i in range(closest_centroid.shape[0]):
+        for j in range(closest_centroid.shape[1]):
+            image[i,j,:] = centroids[closest_centroid[i,j]]
     # *** END YOUR CODE ***
 
     return image
