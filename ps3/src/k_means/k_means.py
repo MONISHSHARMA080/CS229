@@ -26,7 +26,7 @@ def init_centroids(num_clusters, image):
     """
 
     # *** START YOUR CODE ***
-    # raise NotImplementedError('init_centroids function not implemented')
+    centroids_init = (np.random.randn((num_clusters, image.shape[-1])) * 255)
     # *** END YOUR CODE ***
 
     return centroids_init
