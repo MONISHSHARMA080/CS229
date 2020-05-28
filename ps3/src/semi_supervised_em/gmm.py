@@ -14,7 +14,7 @@ def main(is_semi_supervised, trial_num):
           .format('semi-supervised' if is_semi_supervised else 'unsupervised'))
 
     # Load dataset
-    train_path = os.path.join('.', 'train.csv')
+    train_path = os.path.join(os.path.abspath(''), 'train.csv')
     x_all, z_all = load_gmm_dataset(train_path)
 
     # Split into labeled and unlabeled examples
@@ -26,10 +26,25 @@ def main(is_semi_supervised, trial_num):
     # *** START CODE HERE ***
     # (1) Initialize mu and sigma by splitting the n_examples data points uniformly at random
     # into K groups, then calculating the sample mean and covariance for each group
+    group = np.repeat(np.expand_dims(np.random.uniform(low=0, high=K, size=x.shape[0]).astype('int'), axis=1),repeats= x.shape[1], axis=1)
+
+    # mu
+    mu = np.zeros((K, x.shape[1]))
+    for i in range(K): mu[i,:] = np.ma.masked_array(x, mask=(group==i)).mean(axis=0)
+
+    # sigma
+    sigma = np.zeros((K, K))
+    # helper: mu_vector
+    mu_vector = np.zeros(x.shape)
+    for i in range(x.shape[0]):
+        mu_vector[i,:] = mu[group[i,0],:]
+    sigma = np.dot(np.transpose(x - mu_vector), x - mu_vector)/x.shape[0]
     # (2) Initialize phi to place equal probability on each Gaussian
     # phi should be a numpy array of shape (K,)
+    phi = np.full(shape=K, fill_value=1/K)
     # (3) Initialize the w values to place equal probability on each Gaussian
     # w should be a numpy array of shape (m, K)
+    w = np.full(shape=(x.shape[0],K), fill_value=1/K)
     # *** END CODE HERE ***
 
     if is_semi_supervised:
@@ -57,6 +72,7 @@ def run_em(x, w, phi, mu, sigma):
         phi: Initial mixture prior, of shape (k,).
         mu: Initial cluster means, list of k arrays of shape (dim,).
         sigma: Initial cluster covariances, list of k arrays of shape (dim, dim).
+        NOTE: This assumption is wrong. The correct form is sigma.shape = (dim, dim). Assuming gaussians to share one covariance matrix.
 
     Returns:
         Updated weight matrix of shape (n_examples, k) resulting from EM algorithm.
@@ -75,11 +91,49 @@ def run_em(x, w, phi, mu, sigma):
         pass  # Just a placeholder for the starter code
         # *** START CODE HERE
         # (1) E-step: Update your estimates in w
+        n_examples = x.shape[0]
+        k = phi.shape[0]
+        dim = mu.shape[1]
+        for i in range(n_examples):
+            pxz = np.zeros(k)
+            for c in range(k):
+                insigma = np.linalg.inv(sigma)
+                xminusmu = x[i] - mu[c]
+                pxz[c] = np.exp(-0.5 * np.dot(np.dot(np.transpose(xminusmu), insigma), xminusmu)) / (np.sqrt(2 * np.pi) * np.sqrt(np.linalg.det(sigma)))
+            px = np.sum(pxz)
+            w[i] = pxz / px
         # (2) M-step: Update the model parameters phi, mu, and sigma
+        phi = np.mean(w, axis=0)
+        #mu
+        wx = np.dot(np.transpose(w), x)
+        for c in range(k):
+            mu[c] = wx[c] / np.sum(w[:,c])
+        #sigma
+        sigma_k = np.zeros((k, dim, dim))
+        for c in range(k):
+            nmrt = np.zeros((dim, dim))
+            for i in range(n_examples):
+                nmrt += w[i,c] * np.dot(np.expand_dims(x[i] - mu[c], axis=1), np.expand_dims(x[i] - mu[c], axis=0))
+            sigma_k[c] = nmrt / np.sum(w[:,c])
+        sigma = np.mean(sigma_k, axis=0)
         # (3) Compute the log-likelihood of the data to check for convergence.
         # By log-likelihood, we mean `ll = sum_x[log(sum_z[p(x|z) * p(z)])]`.
         # We define convergence by the first iteration where abs(ll - prev_ll) < eps.
         # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
+        prev_ll = ll
+        p = np.zeros((n_examples, k))
+        for i in range(n_examples):
+            pxz = np.zeros(k)
+            for c in range(k):
+                insigma = np.linalg.inv(sigma)
+                xminusmu = x[i] - mu[c]
+                pxz[c] = np.exp(-0.5 * np.dot(np.dot((xminusmu), insigma), np.transpose(xminusmu))) / (np.sqrt(2 * np.pi) * np.sqrt(np.linalg.det(sigma)))
+            logpxz = np.log(pxz)
+            p[i] = logpxz
+        ll = np.sum(p)
+        if prev_ll is not None and np.abs(ll - prev_ll) < eps: break
+        elif it % 10 == 0: print('In iteration {}, the ll is {}'.format(it, ll))
+        it += 1
         # *** END CODE HERE ***
 
     return w
