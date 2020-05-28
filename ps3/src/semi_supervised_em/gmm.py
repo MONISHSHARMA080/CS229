@@ -85,10 +85,9 @@ def run_em(x, w, phi, mu, sigma):
         pass  # Just a placeholder for the starter code
         # *** START CODE HERE
         # (1) E-step: Update your estimates in w
-        n, dim = x.shape
         K = phi.shape[0]
         pxz = getPxz(x, mu, sigma, phi)
-        w = pxz / np.sum(pxz, axis=1)
+        w = pxz / np.sum(pxz, axis=1, keepdims=True)
         # (2) M-step: Update the model parameters phi, mu, and sigma
         phi = np.mean(w, axis=0)
         #mu and sigma
@@ -101,7 +100,7 @@ def run_em(x, w, phi, mu, sigma):
         # We define convergence by the first iteration where abs(ll - prev_ll) < eps.
         # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
         prev_ll = ll
-        pxz = getPxz(x, mu, sigma)
+        pxz = getPxz(x, mu, sigma, phi)
         ll = np.sum(np.log(np.sum(pxz, axis=1)), axis=0)
         if prev_ll is not None and np.abs(ll - prev_ll) < eps: break
         elif it % 10 == 0: print('In iteration {}, the ll is {}'.format(it, ll))
@@ -143,10 +142,27 @@ def run_semi_supervised_em(x, x_tilde, z_tilde, w, phi, mu, sigma):
         pass  # Just a placeholder for the starter code
         # *** START CODE HERE ***
         # (1) E-step: Update your estimates in w
+        n_tilde = x_tilde.shape[0]
+        K = phi.shape[0]
+        pxz = getPxz(x, mu, sigma, phi)
+        w = pxz / np.sum(pxz, axis=1, keepdims=True)
         # (2) M-step: Update the model parameters phi, mu, and sigma
+        phi = np.mean(w, axis=0)
+        wx = np.dot(np.transpose(w), x)
+        for c in range(K):
+            xtc = x_tilde[(z_tilde==c)[:,0]]
+            mu[c] = (wx[c] + alpha * np.sum(xtc)) / (np.sum(w[:, c]) + alpha * n_tilde)
+            sigma[c] = cal_sigma_tilde(x, mu[c], w[:,c], xtc, alpha)
         # (3) Compute the log-likelihood of the data to check for convergence.
         # Hint: Make sure to include alpha in your calculation of ll.
         # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
+        prev_ll = ll
+        pxz = getPxz(x, mu, sigma, phi)
+        ptx = getPtx(x_tilde, mu, sigma, z_tilde)
+        ll = np.sum(np.log(np.append(np.sum(pxz, axis=1), alpha * ptx)), axis=0)
+        if prev_ll is not None and np.abs(ll - prev_ll) < eps: break
+        elif it % 10 == 0: print('In iteration {}, the ll is {}'.format(it, ll))
+        it += 1
         # *** END CODE HERE ***
 
     return w
@@ -164,6 +180,14 @@ def getPxz(x, mu, sigma, phi):
     pxz = pxgivenz * phi
     return pxz
 
+def getPtx(x_tilde, mu, sigma, z_tilde):
+    nt = x_tilde.shape[0]
+    ptx = np.zeros((nt))
+    for i in range(nt):
+        c = int(z_tilde[i][0])
+        ptx[i] = np.exp(-0.5 * np.linalg.multi_dot([x_tilde[i] - mu[c], np.linalg.inv(sigma[c]), np.transpose(x_tilde[i] - mu[c])])) / (np.sqrt(2 * np.pi * np.linalg.det(sigma[c])))
+    return ptx
+
 def cal_Sigma(x, muc, wc):
     n,dim = x.shape
     sigmac = np.zeros((dim, dim))
@@ -171,6 +195,16 @@ def cal_Sigma(x, muc, wc):
         sigmac += wc[i] * np.outer(x[i] - muc, x[i]- muc)
     sigmac = sigmac / np.sum(wc)
     return sigmac
+
+def cal_sigma_tilde(x, muc, wc, xtc, alpha):
+    n, dim = x.shape
+    ntc = xtc.shape[0]
+    sigmac = np.zeros((dim, dim))
+    for i in range(n): sigmac += wc[i] * np.outer(x[i] - muc, x[i]- muc)
+    for j in range(ntc): sigmac += alpha * np.outer(xtc[j] - muc, xtc[j]- muc)
+    sigmac = sigmac / (np.sum(wc) + alpha * ntc)
+    return sigmac
+
 # *** END CODE HERE ***
 
 
@@ -232,11 +266,11 @@ if __name__ == '__main__':
     # Run NUM_TRIALS trials to see how different initializations
     # affect the final predictions with and without supervision
     for t in range(NUM_TRIALS):
-        main(is_semi_supervised=False, trial_num=t)
+        #main(is_semi_supervised=False, trial_num=t)
 
         # *** START CODE HERE ***
         # Once you've implemented the semi-supervised version,
         # uncomment the following line.
         # You do not need to add any other lines in this code block.
-        # main(is_semi_supervised=True, trial_num=t)
+        main(is_semi_supervised=True, trial_num=t)
         # *** END CODE HERE ***
