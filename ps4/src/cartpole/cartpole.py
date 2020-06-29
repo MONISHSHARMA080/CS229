@@ -129,6 +129,16 @@ def choose_action(state, mdp_data):
     """
 
     # *** START CODE HERE ***
+    psa = mdp_data['transition_probs']
+    value = mdp_data['value']
+    # average value of 0
+    v0 = np.sum(np.inner(psa[state,:,0],value))
+    # average value of 1
+    v1 = np.sum(np.inner(psa[state,:,1],value))
+    # make actions
+    if v0 > v1: return 0
+    elif v0 < v1: return 1
+    else: return np.random.randint(2)
     # *** END CODE HERE ***
 
 def update_mdp_transition_counts_reward_counts(mdp_data, state, action, new_state, reward):
@@ -153,6 +163,15 @@ def update_mdp_transition_counts_reward_counts(mdp_data, state, action, new_stat
     """
 
     # *** START CODE HERE ***
+    trans_count = mdp_data['transition_counts']
+    reward_count = mdp_data['reward_counts']
+    # update transition counts
+    trans_count[state, new_state, action] += 1
+    # update reward counts
+    reward_count[new_state, 1] += 1
+    reward_count[new_state, 0] += int(reward==-1)
+    mdp_data['transition_counts'] = trans_count
+    mdp_data['reward_counts'] = reward_count
     # *** END CODE HERE ***
 
     # This function does not return anything
@@ -169,13 +188,27 @@ def update_mdp_transition_probs_reward(mdp_data):
     
     Args:
         mdp_data: The data for your MDP. See initialize_mdp_data.
-
     Returns:
         Nothing
 
     """
 
     # *** START CODE HERE ***
+    trans_count = mdp_data['transition_counts']
+    trans_prob = mdp_data['transition_probs']
+    reward_count = mdp_data['reward_counts']
+    num_states = mdp_data['num_states']
+    # update transition probability
+    for state in range(num_states):
+        cs = np.sum(trans_count[state,:,:], axis=0)
+        if cs[0] > 0: trans_prob[state,:,0] = trans_count[state,:,0] / cs[0]
+        if cs[1] > 0: trans_prob[state,:,1] = trans_count[state,:,1] / cs[1]
+    mdp_data['transition_probs'] = trans_prob
+    # update reward
+    reward_list = mdp_data['reward']
+    for state in range(num_states):
+        if reward_count[state,1] > 0: reward_list[state] = - reward_count[state,0] / reward_count[state,1]
+    mdp_data['reward'] = reward_list
     # *** END CODE HERE ***
 
     # This function does not return anything
@@ -203,11 +236,26 @@ def update_mdp_value(mdp_data, tolerance, gamma):
     """
 
     # *** START CODE HERE ***
+    value = mdp_data['value']
+    new_value = np.zeros((value.shape))
+    reward = mdp_data['reward']
+    trans_prob = mdp_data['transition_probs']
+    num_state = mdp_data['num_states']
+    for state in range(num_state):
+        action = choose_action(state,mdp_data)
+        ave_value = 0
+        for sp in range(num_state):
+            ave_value += trans_prob[state,sp,action] * value[sp]
+        new_value[state] = reward[state] + gamma * ave_value
+    mdp_data['value'] = new_value
+    # stop criteria
+    if np.max(np.abs(new_value - value)) < tolerance: return True
+    return False
     # *** END CODE HERE ***
 
 def main(plot=True):
     # Seed the randomness of the simulation so this outputs the same thing each time
-    np.random.seed(0)
+    np.random.seed(1)
 
     # Simulation parameters
     pause_time = 0.0001
