@@ -2,6 +2,7 @@ import numpy as np
 import util
 
 
+
 def main(train_path, valid_path, save_path):
     """Problem: Logistic regression with Newton's Method.
 
@@ -10,17 +11,12 @@ def main(train_path, valid_path, save_path):
         valid_path: Path to CSV file containing dataset for validation.
         save_path: Path to save predicted probabilities using np.savetxt().
     """
-    x_train, y_train = util.load_dataset(train_path, add_intercept=True)
+    print("in the main")
+    X,Y =util.load_dataset(train_path)
+    print(F"loaded the dataset and the X is {len(X)} and y is {Y.__len__()} ")
+    LogisticRegression().fit(X,Y)
 
     # *** START CODE HERE ***
-    # Train a logistic regression classifier
-    clf = LogisticRegression()
-    clf.fit(x_train, y_train)
-    # Plot decision boundary on top of validation set set
-    x_eval, y_eval = util.load_dataset(valid_path, add_intercept=True)
-    util.plot(x_eval, y_eval, clf.theta, save_path+'.eps')
-    # Use np.savetxt to save predictions on eval set to save_path
-    np.savetxt(save_path, (clf.predict(x_eval)>0.5).astype(int), fmt='%i')
     # *** END CODE HERE ***
 
 
@@ -56,53 +52,64 @@ class LogisticRegression:
             x: Training example inputs. Shape (n_examples, dim).
             y: Training example labels. Shape (n_examples,).
         """
+        
 
         # *** START CODE HERE ***
-        # theta dot x
-        def g(theta, x):
-            return np.dot(x, theta)
+        # ok we need to run newton's method on this, so first of all see the formula and then try to implement this
+        #things we have:-> hipothesis(), hessian(), 
+        def sigmoid(predicted_value)->np.ndarray:
+            return 1./(1+np.exp(-predicted_value))
 
-        # sigmoid
-        def sigmoid(z):
-            return 1 / (1 + np.exp(-z))
+        def z(theta:np.ndarray, x:np.ndarray)->np.ndarray:
+            # print(F"the shape of the x  {x.shape} and theta  --{theta.shape} and their len is {len(x)}")
+            assert theta.shape[0]== x.shape[1], F"In Z function the theta({theta.shape}) and X({x.shape}) should have the same shape"
+            return np.dot( x, theta)
+        
+        
+        def hypothesis(theta:np.ndarray, x:np.ndarray)->np.ndarray:
+            """ hypothesis function"""
+            # print(F"the shape of the x  {x.shape} and theta  --{theta.shape} in the hypothesis()")
+            return sigmoid(z(theta, x))
 
-        # predictions of y
-        def h(theta, x):
-            return sigmoid(g(theta, x))
+        def loglikelyhood(theta, x, y):
+            return np.sum(y*np.log(hypothesis(theta,x)) + (1-y)*np.log(1-hypothesis(theta, x)) ) 
 
-        # log-likelihood function
-        def logLikelihood(theta, x, y):
-            return np.sum(y * np.log(h(theta, x)) + (1 - y) * np.log(h(-theta, x)))
+        def firstDerivative(theta:np.ndarray, x:np.ndarray, y:np.ndarray)->np.ndarray:
+            number_of_examples =  np.shape(x)[1]
+            return (-1/number_of_examples)*np.dot(np.transpose(x), y - hypothesis(theta, x))
 
-        # nabla log-likelihood
-        def first_derivative(theta, x, y):
-            return np.dot(np.transpose(x), y - h(theta, x))
+        def hessian(theta, x, y)->np.ndarray:
+            n = np.shape(x)[0]
+            d = np.zeros((x.shape[1], x.shape[1]))
+            h = hypothesis(theta, x)
+            # print(F"the shape of return value of hypothesis is {h.shape}")
+            # diagonal matrix
+            d = np.diag(h*(1-h))
+            # print(F"the shape of hessian is {d.shape} and at H[2][2] {d[2][2]} and H[4][2] {d[4][2]} and H[5][5] {d[5][5]} ")
+            return np.dot(np.transpose(x), np.dot(d,x))
 
-        # nabla square log-likelihood
-        def hessian(theta, x):
-            n = x.shape[0]
-            d = np.zeros((n, n))
-            hx = h(theta, x)
-            for i in range(n):
-                d[i][i] = hx[i]
-            return np.dot(np.transpose(x), np.dot(d, x))
+        #shape/number of elements in x
+        print(F"in the fit func and eps id {self.eps}")
+        prev_theta = self.theta if self.theta is not None else np.zeros((x.shape[1],))
+        next_theta = prev_theta.copy()
+        diff_between_theta = np.inf 
+        i = 0
+        while diff_between_theta > self.eps :
+            hessian1 = hessian(prev_theta,x, y)
+            first_derivative = firstDerivative(prev_theta, x, y)
 
-        # Initializing theta
-        if self.theta is None: self.theta = np.zeros(shape=[x.shape[1], 1])
-        # Reshape y
-        y = y.reshape(y.shape[0], 1)
-        # Main update iteration
-        for i in range(self.max_iter):
-            print('Iteration ', i)
-            delta_theta = np.dot(np.linalg.inv(hessian(self.theta, x)), first_derivative(self.theta, x, y))
-            updateValue = np.linalg.norm(delta_theta)
-            self.theta += delta_theta
-            if self.verbose:
-                J = -logLikelihood(self.theta, x, y)
-                print('Loss of iteration {} is {}'.format(i, round(J, 5)))
-            # Break if updates too small
-            if updateValue < self.eps:
-                break
+            theta_delta =   np.dot( np.linalg.inv(hessian1) , first_derivative)
+
+            next_theta = prev_theta - theta_delta
+
+            diff_between_theta = np.linalg.norm(next_theta - prev_theta)
+            i+=1
+            initial_theta = next_theta
+            print(F"itetation {i} and the difference between thetas is {diff_between_theta} , is it <= eps {diff_between_theta <= self.eps} and the current theta is {next_theta} and prev theta is {prev_theta}\n\n")
+            prev_theta =  next_theta
+
+        print(F"the loop is over and is it <= eps {diff_between_theta <= self.eps} and diff_between_theta: {diff_between_theta}")
+
         # *** END CODE HERE ***
 
     def predict(self, x):
@@ -116,24 +123,17 @@ class LogisticRegression:
         """
 
         # *** START CODE HERE ***
-        def g(theta, x):
-            return np.dot(x, theta)
-
-        def sigmoid(z):
-            return 1 / (1 + np.exp(-z))
-
-        def h(theta, x):
-            return sigmoid(g(theta, x))
-
-        return h(self.theta, x).reshape(x.shape[0])
         # *** END CODE HERE ***
 
 
 if __name__ == '__main__':
-    main(train_path='ds1_train.csv',
+    try:
+        main(train_path='ds1_train.csv',
          valid_path='ds1_valid.csv',
          save_path='logreg_pred_1.txt')
 
+    except Exception as e:
+        print(F" there is a exception in main and it is {e} \n")
     main(train_path='ds2_train.csv',
          valid_path='ds2_valid.csv',
          save_path='logreg_pred_2.txt')
