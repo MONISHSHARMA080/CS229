@@ -11,12 +11,20 @@ def main(train_path, valid_path, save_path):
         valid_path: Path to CSV file containing dataset for validation.
         save_path: Path to save predicted probabilities using np.savetxt().
     """
-    print("in the main")
-    X,Y =util.load_dataset(train_path)
-    print(F"loaded the dataset and the X is {len(X)} and y is {Y.__len__()} ")
-    LogisticRegression().fit(X,Y)
-
     # *** START CODE HERE ***
+    X,Y =util.load_dataset(train_path, add_intercept=True)
+    print(F"loaded the dataset and the X is {len(X)} and y is {Y.__len__()} ")
+    logRegression = LogisticRegression()
+    logRegression.fit(X,Y)
+    x_eval, y_eval = util.load_dataset(valid_path, add_intercept=True)
+    print(F"\n\n\n\n ----- loaded the valid_path dataset and theta's len is {logRegression.theta.shape}----- \n\n\n")
+    util.plot(x_eval, y_eval, logRegression.theta, save_path+'.jpg')
+    print(F"\n\n----plotted -----\n\n")
+    logRegression.predict(x_eval)
+    # Use np.savetxt to save predictions on eval set to save_path
+    dataset_name = valid_path.split('/')[-1].replace('_valid.csv', '') # Extract ds1 or ds2
+    logRegression.evaluate_model(logRegression, x_eval, y_eval, dataset_name)
+    np.savetxt(save_path, (logRegression.predict(x_eval)>0.5).astype(int), fmt='%i')
     # *** END CODE HERE ***
 
 
@@ -44,6 +52,8 @@ class LogisticRegression:
         self.max_iter = max_iter
         self.eps = eps
         self.verbose = verbose
+        # this is the theta obtained after the training
+        self.theta = None
 
     def fit(self, x, y):
         """Run Newton's Method to minimize J(theta) for logistic regression.
@@ -75,8 +85,8 @@ class LogisticRegression:
             return np.sum(y*np.log(hypothesis(theta,x)) + (1-y)*np.log(1-hypothesis(theta, x)) ) 
 
         def firstDerivative(theta:np.ndarray, x:np.ndarray, y:np.ndarray)->np.ndarray:
-            number_of_examples =  np.shape(x)[1]
-            return (-1/number_of_examples)*np.dot(np.transpose(x), y - hypothesis(theta, x))
+            number_of_examples_for_averaging =  np.shape(x)[1]
+            return (-1/number_of_examples_for_averaging)*np.dot(np.transpose(x), y - hypothesis(theta, x))
 
         def hessian(theta, x, y)->np.ndarray:
             n = np.shape(x)[0]
@@ -105,14 +115,15 @@ class LogisticRegression:
             diff_between_theta = np.linalg.norm(next_theta - prev_theta)
             i+=1
             initial_theta = next_theta
-            print(F"itetation {i} and the difference between thetas is {diff_between_theta} , is it <= eps {diff_between_theta <= self.eps} and the current theta is {next_theta} and prev theta is {prev_theta}\n\n")
+            if self.verbose: print(F"itetation {i} and the difference between thetas is {diff_between_theta} , is it <= eps {diff_between_theta <= self.eps} and the current theta is {next_theta} and prev theta is {prev_theta}\n")
             prev_theta =  next_theta
 
-        print(F"the loop is over and is it <= eps {diff_between_theta <= self.eps} and diff_between_theta: {diff_between_theta}")
+        print(F"the loop is over and is it <= eps {diff_between_theta <= self.eps} and diff_between_theta: {diff_between_theta}\n\n\n\n\n\n\n")
+        self.theta = next_theta
 
         # *** END CODE HERE ***
 
-    def predict(self, x):
+    def predict(self, x:np.ndarray)->np.ndarray:
         """Return predicted probabilities given new inputs x.
 
         Args:
@@ -123,17 +134,53 @@ class LogisticRegression:
         """
 
         # *** START CODE HERE ***
+        def g(theta, x)->np.ndarray:
+            return np.dot(x, theta)
+
+        def sigmoid(z)->np.ndarray:
+            return 1 / (1 + np.exp(-z))
+
+        def h(theta, x)->np.ndarray:
+            return sigmoid(g(theta, x)) 
+        
+        if self.theta is None:
+            raise ValueError("the theta is none so we can't move forward")
+
+        return  h(self.theta, x)
         # *** END CODE HERE ***
 
+    def evaluate_model(self, model, x_eval, y_eval, dataset_name=""):
+        
+        """
+        Evaluates the logistic regression model and prints its accuracy.
+
+            Args:
+                 model: An instance of the LogisticRegression model (already fitted).
+                 x_eval: Evaluation example inputs. Shape (n_examples, dim).
+                 y_eval: True labels for evaluation. Shape (n_examples,).
+                dataset_name: Optional string to identify the dataset (e.g., "ds1").
+        """
+        # Get predicted probabilities
+        y_pred_probs = model.predict(x_eval)
+
+        # Convert probabilities to binary predictions (0 or 1)
+        y_pred_binary = (y_pred_probs >= 0.5).astype(int)
+
+        # Calculate accuracy
+        accuracy = np.mean(y_pred_binary == y_eval)
+
+        # Print the accuracy in the desired format
+        print(f"The accuracy on {dataset_name} validation set using logistic regression is: {accuracy}\n\n\n")
+        return accuracy
 
 if __name__ == '__main__':
-    try:
         main(train_path='ds1_train.csv',
          valid_path='ds1_valid.csv',
          save_path='logreg_pred_1.txt')
 
-    except Exception as e:
-        print(F" there is a exception in main and it is {e} \n")
-    main(train_path='ds2_train.csv',
+
+        main(train_path='ds2_train.csv',
          valid_path='ds2_valid.csv',
-         save_path='logreg_pred_2.txt')
+         save_path='logreg_pred_2.txt') 
+
+
