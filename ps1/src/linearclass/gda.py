@@ -18,7 +18,7 @@ def main(train_path, valid_path, save_path):
     gdaClassifier.fit(x_train, y_train)
     # Plot decision boundary on validation set
     x_eval, y_eval = util.load_dataset(valid_path, add_intercept=True)
-    util.plot(x_eval, y_eval, gdaClassifier.theta, save_path+'.eps')
+    util.plot(x_eval, y_eval, gdaClassifier.theta, save_path+'.jpg')
     # Use np.savetxt to save outputs from validation set to save_path
     np.savetxt(save_path, (gdaClassifier.predict(x_eval) > 0.5).astype(int))
     # *** END CODE HERE ***
@@ -71,7 +71,7 @@ class GDA:
                 y_val = 1 if val == output[i] else 0
                 numerator += y_val * x[i]
                 denominator += y_val
-                print(F"i:{i} the new numerator:{numerator} and denominator:{denominator} and mu(num/deno) is {numerator/ denominator} ")
+                # print(F"i:{i} the new numerator:{numerator} and denominator:{denominator} and mu(num/deno) is {numerator/ denominator} ")
             
             return numerator/ denominator
             
@@ -82,10 +82,10 @@ class GDA:
             output_val = 0
             for i in range(output.shape[0]):
                 output_val += 1 if output[i] == 1 else 0  # Fixed: check output[i], not i
-                print(f"the output(phi in process) is {output_val}")
+                # print(f"the output(phi in process) is {output_val}")
             
             output_val = output_val * (1/output.shape[0])
-            print(f"\n\n ---- the final output calculated is {output_val}\n\n")
+            print(f"\n ---- the phi calculated is {output_val}\n")
             return output_val
 
 
@@ -103,12 +103,12 @@ class GDA:
                     diff = input[i] - mu1
                 # dot product produces a scaler when we don't have a matrix (just a vec, i.e. [] and matrix X matrix is a vector ), so for the 1D we will use outer
                 sigma += np.outer(diff, diff)
-                print(F" at:{i} the sigma matrix is {sigma}")
+                # print(F" at:{i} the sigma matrix is {sigma}")
             print(F"\n\n---- the final sigma matrix is {(1/n)*sigma}-----\n\n")
             print(F"the shape of the sigma matrix is {sigma.shape} ")
             return 1/n*sigma
-        def quadratic_form(mew:np.ndarray, sigmma:np.ndarray)->np.ndarray:
-            return np.dot(np.dot(np.transpose(mew),sigma), mew)
+        def quadratic_form(mew:np.ndarray, sigmma:np.ndarray):
+            return np.dot(np.dot(np.transpose(mew),sigmma), mew)
         
         # now calculate the  theta and theta(knot) and boom we are ready
 
@@ -123,22 +123,29 @@ class GDA:
         theta_0:np.ndarray = (-1/2) * ( quadratic_form(mu1, inverse_sigma) - quadratic_form(mu0, inverse_sigma) ) + np.log(phi/(1-phi))
         theta:np.ndarray = np.dot( inverse_sigma, (mu1 - mu0))
         print(F"\n\n the theta knot is {theta_0} --and theta is {theta} \n\n")
-        self.theta = theta
-        self.theta_0 = theta_0
+        # self.theta = theta
+        # self.theta_0 = theta_0
+        # -- we are storing both of them in a single vector for ease of use --
+        print(F" shape of theta_0 is:{theta_0.shape} and it is {theta_0} and shape of theta is {theta.shape} and it is {theta} ")
+        
+        self.theta = np.zeros((theta.shape[0] +1, 1)) # a vertical vec that has same number of rows as the theta did +1 for the theta_0(scaler)
+        self.theta[0,0] = theta_0
+        self.theta[1:,0] = theta
+        print(F" the new vector/single theta is {self.theta} and it's shape is {self.theta.shape} ")
+        print(F"\n\n--------- training completed --------\n\n")
+        # print(F" predicting at index {1}-> {self.predict(x[1])} and is it == y[{1}] -> {self.predict(x[1]) == y[1] }  ")
 
         # *** END CODE HERE ***
 
     def predict(self, x:np.ndarray):
         """Make a prediction given new inputs x.
-
         Args:
             x: Inputs of shape (n_examples, dim).
-
         Returns:
             Outputs of shape (n_examples,).
         """
         # *** START CODE HERE ***
-        return 1/(1+np.exp( -( np.dot(np.transpose(x), self.theta) + self.theta_0 )  ))
+        return 1/(1+np.exp( -( np.dot( x, self.theta)  )  ))
         # *** END CODE HERE
 
 if __name__ == '__main__':
