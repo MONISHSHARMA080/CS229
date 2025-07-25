@@ -21,8 +21,41 @@ def main(train_path, valid_path, save_path):
     util.plot(x_eval, y_eval, gdaClassifier.theta, save_path+'.jpg')
     # Use np.savetxt to save outputs from validation set to save_path
     np.savetxt(save_path, (gdaClassifier.predict(x_eval) > 0.5).astype(int))
+    # -- quantify the model prediction
+    predictions = (gdaClassifier.predict(x_eval) >= 0.5).astype(int)
+    evaluate_model(predictions, y_eval, save_path)
     # *** END CODE HERE ***
 
+def evaluate_model(predictions, actual, save_path):
+    """
+    Evaluates the performance of the model by comparing predictions with actual labels.
+
+    Args:
+        predictions: The predicted labels from the model.
+        actual: The actual labels from the validation set.
+        save_path: Path to the file where predictions are saved.
+    """
+    # Load the predictions from the saved file to ensure we're using the same data
+    saved_predictions = np.loadtxt(save_path)
+
+    if saved_predictions.shape != actual.shape:
+        print("Warning: Shape of predictions and actual labels do not match.")
+        return
+
+    num_examples = len(actual)
+    correct_predictions = np.sum(saved_predictions == actual)
+    accuracy = correct_predictions / num_examples
+
+    print("\n--- Model Performance Evaluation ---")
+    print(f"Number of examples: {num_examples}")
+    print(f"Number of correct predictions: {correct_predictions}")
+    print(f"Accuracy: {accuracy * 100:.2f}%")
+    print("------------------------------------\n")
+
+    # print("Detailed comparison of predictions and actual labels:")
+    # for i in range(num_examples):
+    #     result = "Success" if saved_predictions[i] == actual[i] else "Failure"
+    #     print(f"Example {i+1}: Actual = {actual[i]}, Predicted = {saved_predictions[i]}, Result = {result}")
 
 class GDA:
     """Gaussian Discriminant Analysis.
@@ -156,3 +189,5 @@ if __name__ == '__main__':
     main(train_path='ds2_train.csv',
          valid_path='ds2_valid.csv',
          save_path='gda_pred_2.txt')
+
+
