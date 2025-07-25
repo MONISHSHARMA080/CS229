@@ -1,0 +1,2 @@
+[tool.pyrefly]
+python_executable = "/home/monish/miniconda3/envs/cs229/bin/python"
