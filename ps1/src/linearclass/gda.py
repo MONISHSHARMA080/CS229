@@ -170,7 +170,7 @@ class GDA:
 
         # *** END CODE HERE ***
 
-    def predict(self, x:np.ndarray):
+    def predict(self, x:np.ndarray)->float:
         """Make a prediction given new inputs x.
         Args:
             x: Inputs of shape (n_examples, dim).
