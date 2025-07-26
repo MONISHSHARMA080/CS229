@@ -115,6 +115,7 @@ class LinearModel(object):
             Outputs of shape (n_examples,).
         """
         # *** START CODE HERE ***
+        print(F"-- in pred -- the shape of theta is {self.theta.shape} and shape of X is {X.shape} ")
         res = np.dot(X, self.theta)
         print(F" the output from predict function is {res} and it's shape is {res.shape} \n\n")
         return res
