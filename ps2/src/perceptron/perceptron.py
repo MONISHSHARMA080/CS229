@@ -3,10 +3,11 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 
+from typing import Callable
 import util
 
 
-def initial_state():
+def initial_state() -> list[tuple[float, np.ndarray]]:
     """Return the initial state for the perceptron.
 
     This function computes and then returns the initial state of the perceptron.
@@ -16,12 +17,11 @@ def initial_state():
     """
 
     # *** START CODE HERE ***
-    # Return an empty state
     return []
     # *** END CODE HERE ***
 
 
-def predict(state, kernel, x_i):
+def predict(state: list[tuple[float, np.ndarray]], kernel: Callable[[np.ndarray, np.ndarray], float], x_i: np.ndarray) -> int:
     """Peform a prediction on a given instance x_i given the current state
     and the kernel.
 
@@ -35,13 +35,19 @@ def predict(state, kernel, x_i):
         Returns the prediction (i.e 0 or 1)
     """
     # *** START CODE HERE ***
-    sum = 0
-    for x_prev, beta in state:
-        sum += beta * kernel(x_prev, x_i)
-    return sign(sum)
+    print(F" the state is ({type(state)}) and kernel is {kernel} and the X_i is {x_i}   ")
+    # score = 0.0
+    # for alpha_j, x_j in state:
+    #     score += alpha_j * kernel(x_j, x_i)
+    #     print(F" the alpha_j is {alpha_j} and x_j is {x_j} and the score is {score} and it's type {type(score)} ")
+    # return sign(score)
+    score = 0.0
+    for alpha_j, x_j in state:
+        score += alpha_j * kernel(x_j, x_i)
+    return sign(score)
     # *** END CODE HERE ***
 
-def update_state(state, kernel, learning_rate, x_i, y_i):
+def update_state(state: list[tuple[float, np.ndarray]], kernel: Callable[[np.ndarray, np.ndarray], float], learning_rate: float, x_i: np.ndarray, y_i: int) -> None:
     """Updates the state of the perceptron.
 
     Args:
@@ -52,15 +58,22 @@ def update_state(state, kernel, learning_rate, x_i, y_i):
         y_i: A 0 or 1 indicating the label for a single instance
     """
     # *** START CODE HERE ***
-    h_x = predict(state, kernel, x_i)
-    beta = learning_rate * (y_i - h_x)
-    state += [(x_i, beta)]
-    return state
+    # prediction = predict(state, kernel, x_i)
+    # beta = learning_rate*(y_i - prediction)
+    # state += [(x_i, beta)]
+    # print(F" new entry to the state is {x_i}---{ beta} ")
+    # return state
+    
+    prediction = predict(state, kernel, x_i)
+    if prediction != y_i:
+        alpha = learning_rate * (2 * y_i - 1) 
+        state.append((alpha, x_i))
     # *** END CODE HERE ***
 
 
 def sign(a):
     """Gets the sign of a scalar input."""
+    print(F" the arg in sign func is {a}")
     if a >= 0:
         return 1
     else:
