@@ -124,18 +124,19 @@ def write_json(filename, value):
     with open(filename, 'w') as f:
         json.dump(value, f)
 
-def plot_loss(loss_values):
+def plot_loss(loss_values, DSName:str):
     plt.ylim([0,4])
     plt.plot(loss_values)
-    plt.savefig('loss_curve.png')
+    plt.savefig(F'loss_curve_{DSName}.png')
 
-def plot_norm(theta_norm):
+def plot_norm(theta_norm, DSName:str):
     # plt.ylim([0, 4])
     plt.plot(theta_norm)
-    plt.savefig('theta_length.png')
+    plt.savefig(F'theta_length_{DSName}.png')
 
-def plot_acc(acc):
+def plot_acc(acc, DSName:str):
     # plt.ylim([0, 4])
     plt.plot(acc)
-    plt.hlines(y=0, linestyles='dashed')
-    plt.savefig('accuracy.png')
+    # plt.hlines(y=0, linestyles='dashed')
+    plt.axhline(y=0, linestyle='dashed')
+    plt.savefig(F'accuracy_{DSName}.png')

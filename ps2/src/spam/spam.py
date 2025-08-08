@@ -6,7 +6,8 @@ import util
 import svm
 
 
-def get_words(message):
+
+def get_words(message:str)-> list[str]:
     """Get the normalized list of words from a message string.
 
     This function should split a message into words, normalize them, and return
@@ -21,13 +22,16 @@ def get_words(message):
     """
 
     # *** START CODE HERE ***
-    lower_message = message.lower()
-    word_list = lower_message.split()
-    return word_list
+    lower_message =  message.lower()
+    punctuation = ".,!?;:()*[]{}\\-/\\"
+    translator = str.maketrans(punctuation, " " * len(punctuation))
+    message = lower_message.translate(translator)
+    return message.split()
+    
     # *** END CODE HERE ***
 
 
-def create_dictionary(messages):
+def create_dictionary(messages:list[str]) -> dict[str, int] :
     """Create a dictionary mapping words to integer indices.
 
     This function should create a dictionary of word to indices using the provided
@@ -44,29 +48,36 @@ def create_dictionary(messages):
     """
 
     # *** START CODE HERE ***
-    word_count = {}
-    for msg in messages:
-        word_set = set(get_words(msg))
-        # words are unique now
-        for word in word_set:
-            # If new word, set count = 1
-            if word not in word_count:
-                word_count[word] = 1
-            # If old word, count += 1
+    # use to count how many times the word is in the dict
+    word_dict: dict[str, int] = {}
+    for sentence in messages:
+        words = get_words(sentence)
+        for word in words:
+            if word not in word_dict:
+                word_dict[word] = 1
             else:
-                word_count[word] += 1
-    # for each word in count, if at least 5, add to dictionary
-    dictionary = {}
-    index = 0
-    for word in word_count:
-        if word_count[word] >= 5:
-            dictionary[word] = index
-            index += 1
-    return dictionary
+                word_dict[word] += 1  
+
+    print(F"got the word and checking the dict size -> {word_dict.__len__()}")
+    # useful is >=5 
+    word_dict_with_useful_words: dict[str, int] = {}
+    index=0
+    for word in word_dict:
+        # print(F" the word in word_dict is {word}, and occurance is  {word_dict[word]}")
+        if  word_dict[word] >= 5:
+            if word not in word_dict_with_useful_words:
+                word_dict_with_useful_words[word] = index
+            else:
+                word_dict_with_useful_words[word] += 1
+            # print(F"at {index}, {word}:{word_dict[word]}(occurred) and in useful dict it is on index {word_dict_with_useful_words[word]} ")
+            index= index + 1
+
+    print(F"got the word and checking the size of imp word dict-> {word_dict_with_useful_words.__len__()}")
+    return word_dict_with_useful_words
     # *** END CODE HERE ***
 
 
-def transform_text(messages, word_dictionary):
+def transform_text(messages:list[str], word_dictionary:dict[str, int])->np.ndarray:
     """Transform a list of text messages into a numpy array for further processing.
 
     This function should create a numpy array that contains the number of times each word
@@ -88,17 +99,20 @@ def transform_text(messages, word_dictionary):
     """
     # *** START CODE HERE ***
     text_matrix = np.zeros((len(messages), len(word_dictionary)))
-    for i in range(len(messages)):
-        word_list = get_words(messages[i])
-        for word in word_list:
+    for  i,val in enumerate(messages):
+        sentence = get_words(val)
+        for word in sentence:
             if word in word_dictionary:
-                j = word_dictionary[word]
-                text_matrix[i,j] += 1
+                col_or_word_index = word_dictionary[word]
+                # print(F"row:{i} the word:{word} in word_dictionary at {col_or_word_index} and len of word_dictionary: {word_dictionary.__len__()} ")
+                text_matrix[i, col_or_word_index] +=1
+    
+    print(F" the text_matrix is {text_matrix.shape} ")
     return text_matrix
     # *** END CODE HERE ***
 
 
-def fit_naive_bayes_model(matrix, labels):
+def fit_naive_bayes_model(matrix:np.ndarray, labels:np.ndarray):
     """Fit a naive bayes model.
 
     This function should fit a Naive Bayes model given a training matrix and labels.
@@ -113,29 +127,72 @@ def fit_naive_bayes_model(matrix, labels):
 
     Returns: The trained model
     """
-
     # *** START CODE HERE ***
-    class naiveBayes():
-        def __init__(self):
-            self.phi_pos = None
-            self.phi_neg = None
-            self.prob_pos = None
-        def fit(self, matrix, labels):
-            exist_matrix = (matrix>0).astype('int')
-            # Calculate phi_j, using Laplace smoothing
-            spam_count = exist_matrix * labels.reshape(labels.shape[0], 1)
-            self.phi_pos = (np.sum(spam_count, axis=0, keepdims=True) + 1) /(np.sum(labels) + 2)
-            nonspam_count = exist_matrix * (labels==0).reshape((labels==0).shape[0], 1)
-            self.phi_neg = (np.sum(nonspam_count, axis=0, keepdims=True) + 1) /(np.sum(labels==0) + 2)
-            # Calculate probability of positive as a whole
-            self.prob_pos = np.mean(labels)
-    naiveBayesModel = naiveBayes()
-    naiveBayesModel.fit(matrix, labels)
-    return naiveBayesModel
+    assert isinstance(matrix, np.ndarray) , F"the matrix(arg) is not a instance of np.ndarray, type mismatch , we got {type(matrix)}"
+    assert isinstance(labels, np.ndarray ) , F"the labels(arg) is not a instance of np.ndarray, type mismatch, we got {type(labels)} "
+    print(F"the label is {labels[33]} and shape is {labels.shape}")
+    num_documents , vocab_size = matrix.shape
+    assert num_documents == len(labels), F"the num of emails/text({num_documents}) should be equal to the number of lables({len(labels)})"
+    num_spam_docs = np.sum(labels == 1) # since it consist of 1,0 , adding it will give me total spam
+    num_non_spam_docs = num_documents - num_spam_docs  
+    p_y_true:float = num_spam_docs/num_documents
+    p_y_false = 1 - p_y_true
+    log_p_y_true:float = np.log(p_y_true)
+    log_p_y_false:float = np.log(p_y_false)
+    print(F"the prob of y is {p_y_true}")
+
+    # res_arr = np.zeros((vocab_size,1)) # for numerator of phi
+    # --- if j word is present in the i'th eg then  and the y is = class(1|0) then we add 1 to the array but the for loop in python is slow so we 
+    # ( 2 res array one for the Y = 1 and another for the Y = 0 )
+    #
+    # if the row i is spam(based on y) then it will keep it and discard the other, so we have a array that match the comp 
+    #
+    # -- note this is a multimodal event model i.e the a single word can appear many times and so the word in matrix [i][j] might not be binary as it appears
+    # many times
+    spam_doc_array = matrix[labels == 1]
+    total_spam_word_counts:float = np.sum(spam_doc_array)
+
+    non_spam_doc_array = matrix[labels == 0]
+    total_non_spam_word_counts:float = np.sum(non_spam_doc_array )
+
+    print(F" the spam_doc shape is {spam_doc_array.shape} and the non spam_doc is  {non_spam_doc_array.shape} ")
+    print(F"the total_spam_word_counts count is {total_spam_word_counts} and total_non_spam_word_counts is {total_non_spam_word_counts}  ")
+
+
+    # -- calc for the spam array -- or phi_pos
+    # now we need a array that tells us the number of time jth word word[i][j] comes in spam/non-spam 
+
+    sum_word_counts_in_spam:np.ndarray = np.sum(spam_doc_array, axis=0)
+
+    numerator = 1 + sum_word_counts_in_spam
+    denominator = total_spam_word_counts + vocab_size # vocab_size for the multinomial laplace smoothing
+    
+    phi_pos:np.ndarray = numerator/denominator
+    
+
+
+    # --- calc for the phi neg.
+
+    sum_word_counts_in_not_spam:np.ndarray = np.sum(non_spam_doc_array, axis=0)
+    numerator = 1 + sum_word_counts_in_not_spam
+    denom =  vocab_size + total_non_spam_word_counts
+    phi_neg:np.ndarray = numerator/denom
+
+    print(F" type of log_prob_y_spam:{type(np.log(p_y_true))} log_phi_pos: {type(np.log(phi_pos))}  ")
+    return {
+        'log_prob_y_spam': np.log(p_y_true),
+        'log_prob_y_not_spam': np.log(p_y_false),
+        'log_phi_pos': np.log(phi_pos),
+        'log_phi_neg': np.log(phi_neg),
+        'phi_pos': phi_pos,
+        'phi_neg': phi_neg,
+    }
+
+
     # *** END CODE HERE ***
 
 
-def predict_from_naive_bayes_model(model, matrix):
+def predict_from_naive_bayes_model(model, matrix:np.ndarray)->np.ndarray:
     """Use a Naive Bayes model to compute predictions for a target matrix.
 
     This function should be able to predict on the models that fit_naive_bayes_model
@@ -147,19 +204,31 @@ def predict_from_naive_bayes_model(model, matrix):
 
     Returns: A numpy array containing the predictions from the model
     """
-    # *** START CODE HERE ***
-    # For more stable output, use log instead of prod
-    # score = sum(log(p(x_i|y))) + p(y)
-    # where p(x_i|y) = model.phi[i]
-    pos_score = np.sum(np.log(model.phi_pos) * matrix, axis=1, keepdims=True) + np.log(model.prob_pos)
-    neg_score = np.sum(np.log(model.phi_neg) * matrix, axis=1, keepdims=True) + np.log(1-model.prob_pos)
+    log_prob_y_spam = model['log_prob_y_spam']
+    log_prob_y_not_spam = model['log_prob_y_not_spam']
+    log_phi_pos = model['log_phi_pos']
+    log_phi_neg = model['log_phi_neg']
+    assert isinstance(log_prob_y_spam, float ), F"log_prob_y_spam is not of type(expected) float, it is {type(log_prob_y_spam)}"
+    assert isinstance(log_prob_y_not_spam, float ), F"log_prob_y_not_spam is not of type(expected) float, it is {type(log_prob_y_not_spam)}"
+    assert isinstance(log_phi_pos, np.ndarray ), F"log_phi_pos is not of type(expected) np.ndarray, it is {type(log_phi_pos)}"
+    assert isinstance(log_phi_neg, np.ndarray ), F"log_phi_neg is not of type(expected) np.ndarray, it is {type(log_phi_neg)}"
+
+    predcition_spam = np.sum ( log_phi_pos * matrix, axis=1, keepdims=True      ) + log_prob_y_spam
+    predcition_not_spam =  np.sum(log_phi_neg * matrix, axis=1, keepdims=True) +log_prob_y_not_spam 
+
+    print(F" the predcition_spam's shape is {predcition_spam.shape} and predcition_not_spam shape is {predcition_not_spam.shape} \n")
+    # print(F" the predcition_spam is {predcition_spam} and predcition_not_spam  {predcition_not_spam} ")
     predicts = np.zeros((matrix.shape[0],1))
-    predicts[pos_score>neg_score] = 1
+    predicts[predcition_spam > predcition_not_spam] = 1
+    # print(F" the prediction[] {predicts.shape} and {predicts} ")
+
     return predicts
+    
+    # *** START CODE HERE ***
     # *** END CODE HERE ***
 
 
-def get_top_five_naive_bayes_words(model, dictionary):
+def get_top_five_naive_bayes_words(model, dictionary:dict[str, int])->list[str]:
     """Compute the top five words that are most indicative of the spam (i.e positive) class.
 
     Ues the metric given in part-c as a measure of how indicative a word is.
@@ -172,19 +241,49 @@ def get_top_five_naive_bayes_words(model, dictionary):
     Returns: A list of the top five most indicative words in sorted order with the most indicative first
     """
     # *** START CODE HERE ***
-    indicative = (model.phi_pos / model.phi_neg).reshape(model.phi_pos.shape[1])
-    top_five_index = indicative.argsort()[-5:][::-1]
-    # Find top five words by finding the keys from values in dictionary
-    top_five_words = [None] * 5
-    for key, value in dictionary.items():
-        if value in top_five_index:
-            rank = np.where(top_five_index == value)[0][0]
-            top_five_words[rank] = key
+    log_prob_y_spam = model['log_prob_y_spam']
+    log_prob_y_not_spam = model['log_prob_y_not_spam']
+    log_phi_pos = model['log_phi_pos']
+    log_phi_neg = model['log_phi_neg']
+    phi_pos = model['phi_pos']
+    phi_neg = model['phi_neg']
+
+    assert isinstance(log_prob_y_spam, float ), F"log_prob_y_spam is not of type(expected) float, it is {type(log_prob_y_spam)}"
+    assert isinstance(log_prob_y_not_spam, float ), F"log_prob_y_not_spam is not of type(expected) float, it is {type(log_prob_y_not_spam)}"
+    assert isinstance(log_phi_pos, np.ndarray ), F"log_phi_pos is not of type(expected) np.ndarray, it is {type(log_phi_pos)}"
+    assert isinstance(log_phi_neg, np.ndarray ), F"log_phi_neg is not of type(expected) np.ndarray, it is {type(log_phi_neg)}"
+    assert isinstance(phi_neg, np.ndarray ), F"phi_neg is not of type(expected) np.ndarray, it is {type(phi_neg)}"
+    assert isinstance(phi_pos, np.ndarray ), F"phi_pos is not of type(expected) np.ndarray, it is {type(phi_pos)}"
+
+    original_score = (log_phi_pos - log_phi_neg)
+    print("")
+    print(F" original_score is {original_score[40:100]} ")
+    # We sort the negative scores to get indices in descending order of the original scores
+    number_of_most_likely_word = 5
+    # Find the indices of the top 5 most indicative words.
+    # np.argsort() returns the indices that would sort the array in ascending order.
+    # We want the highest scores, so we take the last 5 elements of the argsort result.
+    # The [::-1] slice then reverses this to get the indices in descending order of score.
+    # This is a concise and efficient way to get the top N indices.
+    index_of_most_likely_word =np.argsort(original_score, axis=0)[-number_of_most_likely_word:][::-1]
+    print(F"-- {index_of_most_likely_word}  --")
+
+    top_five_words:list[str]= []
+    for i in range(number_of_most_likely_word):
+        # here i repres the index in the res array as it is sensitive
+        for word_key,index_of_word in dictionary.items():
+            # print(F" the key is {word_key} and item/index is {index_of_word}")
+            if dictionary[word_key] == index_of_most_likely_word[i]:
+                # print(F"the key of word is {word_key} and index of most likely word {index_of_most_likely_word[i]} ")
+                # print(F"the word {word_key}  at index {dictionary[word_key]} and the index in index_of_most_likely_word is {i} and it is {index_of_most_likely_word[i]} ")
+                top_five_words.append(word_key)
+    print(f'the top 5 words are {top_five_words}')
     return top_five_words
+
     # *** END CODE HERE ***
 
 
-def compute_best_svm_radius(train_matrix, train_labels, val_matrix, val_labels, radius_to_consider):
+def compute_best_svm_radius(train_matrix:np.ndarray, train_labels:np.ndarray, val_matrix:np.ndarray, val_labels:np.ndarray, radius_to_consider:list):
     """Compute the optimal SVM radius using the provided training and evaluation datasets.
 
     You should only consider radius values within the radius_to_consider list.
@@ -201,12 +300,28 @@ def compute_best_svm_radius(train_matrix, train_labels, val_matrix, val_labels, 
         The best radius which maximizes SVM accuracy.
     """
     # *** START CODE HERE ***
-    accuracy_list = [None] * len(radius_to_consider)
-    for i in range(len(radius_to_consider)):
-        predicts = svm.train_and_predict_svm(train_matrix, train_labels, val_matrix, radius_to_consider[i])
-        accuracy_list[i] = np.mean(predicts==val_labels)
-    best_index = accuracy_list.index(max(accuracy_list))
-    return radius_to_consider[best_index]
+    assert isinstance(train_labels, np.ndarray)
+    assert isinstance(train_matrix, np.ndarray)
+    assert isinstance(val_matrix, np.ndarray)
+    assert isinstance(val_labels, np.ndarray)
+    assert isinstance(radius_to_consider, list)
+
+    accuracy_list = [0.0]*len(radius_to_consider)
+    for i,radius  in enumerate(radius_to_consider):
+        precition = svm.train_and_predict_svm(train_matrix, train_labels, val_matrix, radius)
+        accuracy_list[i] =np.mean(precition==val_labels)
+
+    print(F" the accuracy_list is {accuracy_list}")
+    best_fit = 0
+    best_radius_index =0
+    for i,j in enumerate(accuracy_list):
+        if j >= best_fit:
+            best_fit = j
+            best_radius_index =  i
+
+    print(F" the best fit for radius is at {best_radius_index}  and it is {best_fit} and the best fit radius is {radius_to_consider[best_radius_index]}")
+    return radius_to_consider[best_radius_index]
+    
     # *** END CODE HERE ***
 
 
@@ -222,6 +337,7 @@ def main():
     util.write_json('spam_dictionary', dictionary)
 
     train_matrix = transform_text(train_messages, dictionary)
+    print(F" the train matrix is {train_matrix.shape}")
 
     np.savetxt('spam_sample_train_matrix', train_matrix[:100,:])
 
