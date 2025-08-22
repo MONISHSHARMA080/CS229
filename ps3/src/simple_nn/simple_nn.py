@@ -1,12 +1,12 @@
 import util
 import numpy as np
 
-def example_weights():
+def example_weights() -> dict[str, float]:
     """This is an example function that returns weights.
     Use this function as a template for optimal_step_weights and optimal_sigmoid_weights.
     You do not need to modify this function for this assignment.
     """
-    w = {}
+    w:dict[str, float] = {}
 
     w['hidden_layer_0_1'] = 0
     w['hidden_layer_1_1'] = 0
@@ -69,7 +69,7 @@ def optimal_linear_weights():
 
     return w
 
-def compute_predictions(X, weights, step_fn=True):
+def compute_predictions(X, weights:dict[str, float], step_fn=True):
     def get(names):
         return [weights[name] for name in names]
 

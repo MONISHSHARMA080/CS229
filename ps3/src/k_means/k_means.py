@@ -1,4 +1,4 @@
-from __future__ import division, print_function
+from PIL.ImageChops import difference
 import argparse
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -6,8 +6,16 @@ import numpy as np
 import os
 import random
 
+def characteristicFunction(condition:bool ,whatToReturn=1):
+        """ for eg 1{x=2} else 0"""
+        assert type(condition) == bool or np.bool, F"the condition var should be bool, but we got {type(condition)} and it is {condition}" 
+        assert type(whatToReturn) == float or int, F"the whatToReturn var should be float or int" 
+        if condition:
+            return whatToReturn
+        else:
+            return 0
 
-def init_centroids(num_clusters, image):
+def init_centroids(num_clusters:int, image:np.ndarray)->np.ndarray:
     """
     Initialize a `num_clusters` x image_shape[-1] nparray to RGB
     values of randomly chosen pixels of`image`
@@ -26,13 +34,34 @@ def init_centroids(num_clusters, image):
     """
 
     # *** START YOUR CODE ***
-    centroids_init = (np.random.uniform(size = (num_clusters, image.shape[-1])) * 255).astype('int')
+    assert num_clusters <= image.size // image.shape[-1], F"The number of clusters ({num_clusters}) must be less than or equal to the total number of pixels ({image.size // image.shape[-1]})."
+    assert isinstance(num_clusters, int), "num_clusters must be an integer."
+    assert isinstance(image, np.ndarray), "image must be a numpy array."
+    assert image.ndim == 3, "image must be a 3D array (H, W, C)."
+    assert num_clusters > 0, "num_clusters must be greater than 0."
+
+    H, W, C = image.shape
+
+    assert C == 3, F" we except the image to have 3 channels"
+
+    print(F"the image has height:{H}, width:{W} and Channels(R,G,B):{C} ")
+    num_pixels = H * W
+    assert num_clusters <= num_pixels, f"num_clusters:{num_clusters} cannot be greater than the number of pixels:{num_pixels}."
+
+    # Reshape the image to a 2D array of pixels
+    pixels = image.reshape(num_pixels, C)
+
+    random_indices = np.random.choice(num_pixels, size=num_clusters, replace=False)
+
+    # Use the random indices to get the corresponding pixel values
+    centroids_init = pixels[random_indices]
+
+    return centroids_init.astype('int')
     # *** END YOUR CODE ***
 
-    return centroids_init
 
 
-def update_centroids(centroids, image, max_iter=30, print_every=10):
+def update_centroids(centroids:np.ndarray, image:np.ndarray, max_iter=30, print_every=10):
     """
     Carry out k-means centroid update step `max_iter` times
 
@@ -52,41 +81,71 @@ def update_centroids(centroids, image, max_iter=30, print_every=10):
     new_centroids : nparray
         Updated centroids
     """
-
     # *** START YOUR CODE ***
     # Usually expected to converge long before `max_iter` iterations
-    # Initialize `dist` vector to keep track of distance to every centroid
-    new_centroids = centroids.astype('float')
-    dist = np.zeros((image.shape[0], image.shape[1], len(centroids)))
-    # Loop over all centroids and store distances in `dist`
-    def getDist(image, centroid):
-        return np.sqrt(np.sum((image - centroid)**2, axis = -1))
-    for num in range(max_iter):
-        position_change = 0
-        for i in range(len(centroids)):
-            centroid = new_centroids[i]
-            dist[:, :, i] = (getDist(image, centroid))
-        # Find closest centroid and update `new_centroids`
-        closest_centroid = dist.argmin(axis=-1)
-        # Update `new_centroids`
-        for i in range(len(centroids)):
-            mask = (closest_centroid == i)
-            closest_points = image[mask, :]
-            if len(closest_points) != 0:
-                new_centroid = np.mean(closest_points, axis=0)
-                position_change += np.sqrt(np.sum((new_centroid - new_centroids[i])**2))
-                new_centroids[i] = new_centroid
-        # Convergence
-        if position_change <= 5:
-            print('Algorithm converged.')
-            break
-        if num % print_every == 0:
-            print('In iteration {}, the positions of centroids changed by {}'.format(num, position_change))
-    # *** END YOUR CODE ***
+    image_height, image_width, image_channels = image.shape
+    reshaped_imgae =image.reshape(image_height * image_width, image_channels)
+    # C^(i)  for every pixel
+    cluster_index = np.zeros((image_height * image_width, 1))
+    for i in range(max_iter):
+        at_iteration = i
+        # all_close =np.allclose(new_centroids, centroids)
+        # print(F"at mew_{i} are we allclose {all_close}")
+        # if all_close: return centroids  
+        # centroids = new_centroids
+        i =0
+        # calculating C^(i)
+        print(F"  at iteration {at_iteration} the centroid is \n {centroids.astype(float)}")
+        new_centroids = np.zeros_like(centroids).astype(float)
+        for current_pixel in reshaped_imgae:
+            # print(F"at {i} and image is of len {image.shape[0]} and image is of shape {image.shape} and centroid's shape is {centroids.shape} and current_pixel is of shape {current_pixel.shape}  ")
+            # for every pixel we loop through the centroid to find the nearest one
+            square_difference = np.square(current_pixel - centroids )
+            square_difference = np.sum(square_difference, axis = 1)
+            argmin_diff= np.argmin(square_difference)
+            cluster_index[i] = argmin_diff
+            # squared_diff = difference_squared
+            # print(F" the difference is {square_difference} and it's shape is {square_difference.shape} ")
+            i+=1
+        # calculating mu_j for each j 
+        # updating the centroids(mean)
+        print(F"  at iteration {at_iteration} after the C(i) the centroid is \n {centroids.astype(float)}")
+        for cluster_centroid_index in range(centroids.shape[0]):
+            cluster_centroid = centroids[cluster_centroid_index]
+            num = 0.0
+            den = 0.0
+            index = 0
+
+            # print(F" the shape of centroids are {centroids.shape}")
+            assert cluster_index.shape[0] == reshaped_imgae.shape[0]
+            for pixel in reshaped_imgae:
+                # cond = (cluster_index[index] == cluster_centroid_index )
+                # print(F" the cluseter index is {cluster_index[index]} and cluster_centroid_index is {cluster_centroid_index}")
+                num += characteristicFunction(cluster_index[index][0] == cluster_centroid_index) * pixel
+                den += characteristicFunction(cluster_index[index][0] == cluster_centroid_index) 
+                # if cond.all() == True:
+                # print(F" the num is {num} and the den is {den}")
+                index += 1
+            assert den != 0, F" the deno.. can't be 0"
+            mu_j = num/den
+            new_centroids[cluster_centroid_index] =mu_j
+            print(F"\n\n---at mew{cluster_centroid_index}  and the new_centroids is\n {new_centroids}\n-------\n\n")
+            # input("Hit Enter to move forward")
+        
+        all_close =np.allclose(new_centroids, centroids)
+        print(F"at iteration {at_iteration} are we allclose {all_close}")
+        print(F"diff b/w new_centroids and centroids is \n {new_centroids - centroids}")
+        if all_close: print(F"the new_centroids is \n{new_centroids}\n------- centroid is \n {centroids} \n"); return new_centroids  
+        centroids = new_centroids
+        print(F"------+++++")
+
+
     return new_centroids
+    # Initialize `dist` vector to keep track of distance to every centroid
+    # *** END YOUR CODE ***
 
 
-def update_image(image, centroids):
+def update_image(image:np.ndarray, centroids:np.ndarray):
     """
     Update RGB values of pixels in `image` by finding
     the closest among the `centroids`
@@ -104,23 +163,43 @@ def update_image(image, centroids):
         Updated image
     """
 
+    assert isinstance(image, np.ndarray), "image must be a numpy array."
+    assert isinstance(centroids, np.ndarray), "centroids must be a numpy array."
+    image_height, image_width, image_channels = image.shape
+    reshaped_image =image.reshape(image_height * image_width, image_channels)
+    new_img = reshaped_image.copy()
+    image_index = 0
+    for pixel in reshaped_image:
+        # loop over each centorid to find the best fit
+        assert image_index <= image_height * image_width and reshaped_image.shape[0], F"the image_index:{image_index} should not be able to exceed image size:{reshaped_image.shape[0]} "
+        assert isinstance(pixel, np.ndarray), "pixel must be a numpy array."
+        assert len(pixel) == image_channels, F"the lenght of pixels:{len(pixel)} should be same as the image channels(pixel should contain R,G,B in a array for eg) :{image_channels} "
+        min_distance_squared = np.inf
+        closest_centroid_index = 00.00
+        for index_centroid in range(centroids.shape[0]):
+            centroid:np.ndarray = centroids[index_centroid]
+            assert isinstance(centroid, np.ndarray), "centroid must be a numpy array."
+            l2_norm = np.sum((pixel - centroid)**2)
+            if l2_norm < min_distance_squared:
+                min_distance_squared = l2_norm
+                closest_centroid_index = index_centroid
+
+        # got the index of the closest_centroid
+        print(F"for pixel the min_distance_squared is {min_distance_squared} and closest_centroid_index is {closest_centroid_index} and the pixels for new img (or centroids[closest_centroid_index]) is {centroids[closest_centroid_index]}  ")
+        new_img[image_index] = centroids[closest_centroid_index]
+        image_index+=1
+
+    print(F"the new_img (before resizing ) is {new_img.shape}")
+    new_image = new_img.reshape((image_height, image_width, image_channels))
+    print(F"the new_image after resizing is of type {type(new_image)} and it is {new_image}")
+    print(F"=== the new/updated image  is {new_image.shape}")
+    return new_image
+            
+
+
     # *** START YOUR CODE ***
-    # Initialize `dist` vector to keep track of distance to every centroid
-    dist = np.zeros((image.shape[0], image.shape[1], centroids.shape[0]))
-    # Loop over all centroids and store distances in `dist`
-    def getDist(image, centroid):
-        return np.sqrt(np.sum((image - centroid)**2, axis = -1))
-    for i in range(centroids.shape[0]):
-        centroid = centroids[i]
-        dist[:, :, i] = (getDist(image, centroid))
-    # Find closest centroid and update pixel value in `image`
-    closest_centroid = dist.argmin(axis=-1)
-    for i in range(closest_centroid.shape[0]):
-        for j in range(closest_centroid.shape[1]):
-            image[i,j,:] = centroids[closest_centroid[i,j]]
     # *** END YOUR CODE ***
 
-    return image
 
 
 def main(args):
