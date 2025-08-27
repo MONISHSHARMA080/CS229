@@ -55,7 +55,7 @@ def main(is_semi_supervised, trial_num):
     plot_gmm_preds(x, z_pred, is_semi_supervised, plot_id=trial_num)
 
 
-def run_em(x, w, phi, mu, sigma):
+def run_em(x:np.ndarray, w:np.ndarray, phi:np.ndarray, mu:list, sigma:list):
     """Problem 3(d): EM Algorithm (unsupervised).
 
     See inline comments for instructions.
@@ -76,41 +76,52 @@ def run_em(x, w, phi, mu, sigma):
     # No need to change any of these parameters
     eps = 1e-3  # Convergence threshold
     max_iter = 1000
+    assert isinstance(x, np.ndarray), F"the var x shpould be of type np.ndarray but we got {type(x)} "
+    assert isinstance(w, np.ndarray), F"the var w shpould be of type np.ndarray but we got {type(w)} "
+    assert isinstance(phi, np.ndarray), F"the var phi shpould be of type np.ndarray but we got {type(phi)} "
+    assert isinstance(mu, list), F"the var mu shpould be of type list but we got {type(mu)} "
+    assert isinstance(sigma, list), F"the var sigma shpould be of type list but we got {type(sigma)} "
+    assert phi.shape[0] == w.shape[1] , F" the phi's row is {phi.shape[0]} and the w's shape is {w.shape[1]}, they should be equal  "
 
     # Stop when the absolute change in log-likelihood is < eps
     # See below for explanation of the convergence criterion
-    it = 0
+    number_of_eg = x.shape[0]
+    number_of_clusters = len(mu)
+    print(F"the type of X is {type(x)}, w:{type(w) }, phi:{type(phi)}, mu:{type(mu)}, sigma:{type(sigma)} and no of eg is {number_of_eg} and no of cluster is {number_of_clusters} ")
+    iteration = 0
     ll = prev_ll = None
-    while it < max_iter and (prev_ll is None or np.abs(ll - prev_ll) >= eps):
-        pass  # Just a placeholder for the starter code
+    w = np.zeros_like(x)
+    while iteration < max_iter and (prev_ll is None or np.abs(ll - prev_ll) >= eps):
+        # pass  # Just a placeholder for the starter code
         # *** START CODE HERE
         # (1) E-step: Update your estimates in w
-        K = phi.shape[0]
-        pxz = getPxz(x, mu, sigma, phi)
+        # K = phi.shape[0]
+        pxz = P_x_given_z(x, mu, sigma, phi)
+        assert isinstance(pxz, np.ndarray)
         w = pxz / np.sum(pxz, axis=1, keepdims=True)
-        # (2) M-step: Update the model parameters phi, mu, and sigma
+        # # (2) M-step: Update the model parameters phi, mu, and sigma
+        # give me the mean of all the clusters in it
         phi = np.mean(w, axis=0)
         #mu and sigma
         wx = np.dot(np.transpose(w), x)
         for c in range(K):
             mu[c] = wx[c] / np.sum(w[:,c])
             sigma[c] = cal_Sigma(x, mu[c], w[:,c])
-        # (3) Compute the log-likelihood of the data to check for convergence.
-        # By log-likelihood, we mean `ll = sum_x[log(sum_z[p(x|z) * p(z)])]`.
-        # We define convergence by the first iteration where abs(ll - prev_ll) < eps.
-        # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
+        # # (3) Compute the log-likelihood of the data to check for convergence.
+        # # By log-likelihood, we mean `ll = sum_x[log(sum_z[p(x|z) * p(z)])]`.
+        # # We define convergence by the first iteration where abs(ll - prev_ll) < eps.
+        # # Hint: For debugging, recall part (a). We showed that ll should be monotonically increasing.
         prev_ll = ll
-        pxz = getPxz(x, mu, sigma, phi)
+        pxz = P_x_given_z(x, mu, sigma, phi)
         ll = np.sum(np.log(np.sum(pxz, axis=1)), axis=0)
         if prev_ll is not None and np.abs(ll - prev_ll) < eps: break
-        elif it % 10 == 0: print('In iteration {}, the ll is {}'.format(it, ll))
-        it += 1
+        elif iteration % 10 == 0: print('In iteration {}, the ll is {}'.format(iteration, ll))
+        iteration += 1
         # *** END CODE HERE ***
-
     return w
 
 
-def run_semi_supervised_em(x, x_tilde, z_tilde, w, phi, mu, sigma):
+def run_semi_supervised_em(x:np.ndarray, x_tilde:np.ndarray, z_tilde:np.ndarray, w:np.ndarray, phi:np.ndarray, mu:list, sigma:list):
     """Problem 3(e): Semi-Supervised EM Algorithm.
 
     See inline comments for instructions.
@@ -134,12 +145,17 @@ def run_semi_supervised_em(x, x_tilde, z_tilde, w, phi, mu, sigma):
     eps = 1e-3   # Convergence threshold
     max_iter = 1000
 
+    assert isinstance(x, np.ndarray), F"the var x shpould be of type np.ndarray but we got {type(x)} "
+    assert isinstance(w, np.ndarray), F"the var w shpould be of type np.ndarray but we got {type(w)} "
+    assert isinstance(phi, np.ndarray), F"the var phi shpould be of type np.ndarray but we got {type(phi)} "
+    assert isinstance(mu, list), F"the var mu shpould be of type list but we got {type(mu)} "
+    assert isinstance(sigma, list), F"the var sigma shpould be of type list but we got {type(sigma)} "
+    assert phi.shape[0] == w.shape[1] , F" the phi's row is {phi.shape[0]} and the w's shape is {w.shape[1]}, they should be equal  "
     # Stop when the absolute change in log-likelihood is < eps
     # See below for explanation of the convergence criterion
     it = 0
     ll = prev_ll = None
     while it < max_iter and (prev_ll is None or np.abs(ll - prev_ll) >= eps):
-        pass  # Just a placeholder for the starter code
         # *** START CODE HERE ***
         # (1) E-step: Update your estimates in w
         n_tilde = x_tilde.shape[0]
@@ -167,6 +183,21 @@ def run_semi_supervised_em(x, x_tilde, z_tilde, w, phi, mu, sigma):
 
     return w
 
+def P_x_given_z(x:np.ndarray, mu:list, sigma:list, phi:np.ndarray)->np.ndarray:
+    """ return a array where the row is no of eg in x and column in the no of cluster(taken from len of mu) """
+    assert isinstance(x, np.ndarray), F"the var x shpould be of type np.ndarray but we got {type(x)} "
+    assert isinstance(phi, np.ndarray), F"the var phi shpould be of type np.ndarray but we got {type(phi)} "
+    assert isinstance(mu, list), F"the var mu shpould be of type list but we got {type(mu)} "
+    assert isinstance(sigma, list), F"the var sigma shpould be of type list but we got {type(sigma)} "
+    n = x.shape[0]
+    K = len(mu)
+    pxgivenz = np.zeros((n,K))
+    for c in range(K):
+        for i in range(n):
+            pxgivenz[i,c] = np.exp(-0.5 * np.linalg.multi_dot([x[i] - mu[c], np.linalg.inv(sigma[c]), np.transpose(x[i] - mu[c])])) / (np.sqrt(2 * np.pi * np.linalg.det(sigma[c])))
+    pxz = pxgivenz * phi
+    return pxz
+    
 
 # *** START CODE HERE ***
 # Helper functions
@@ -262,7 +293,7 @@ def load_gmm_dataset(csv_path):
 
 
 if __name__ == '__main__':
-    np.random.seed(229)
+    np.random.seed(22199)
     # Run NUM_TRIALS trials to see how different initializations
     # affect the final predictions with and without supervision
     for t in range(NUM_TRIALS):
