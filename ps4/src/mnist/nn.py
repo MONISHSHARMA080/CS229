@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 
-def softmax(x):
+def softmax(x:np.ndarray)->np.ndarray:
     """
     Compute softmax function for a batch of input values. 
     The first dimension of the input corresponds to the batch size. The second dimension
@@ -21,12 +21,16 @@ def softmax(x):
         A 2d numpy float array containing the softmax results of shape batch_size x number_of_classes
     """
     # *** START CODE HERE ***
-    x = x.astype(np.longdouble)
-    ex = np.exp(x)
-    return ex/np.sum(ex, axis=1, keepdims=True)
+    assert isinstance(x, np.ndarray) ,F"expected the x to be of type np.ndarray but got {type(x)} "
+    num = np.exp( x.astype(np.longdouble))
+    deno = np.sum(num, axis = 1, keepdims = True ) # row wise sum
+    result = num/deno
+    # print(F"the softmax calculated is {result} ")
+    assert isinstance(result , np.ndarray) ,F"expected the result(of softmax) be of type np.ndarray but got {type(x)} "
+    return result
     # *** END CODE HERE ***
 
-def sigmoid(x):
+def sigmoid(x:np.ndarray)->np.ndarray:
     """
     Compute the sigmoid function for the input here.
 
@@ -37,7 +41,11 @@ def sigmoid(x):
         A numpy float array containing the sigmoid results
     """
     # *** START CODE HERE ***
-    return 1 / (1 + np.exp(-x))
+    assert isinstance(x, np.ndarray) ,F"expected the x to be of type np.ndarray but got {type(x)} "
+    res = 1 / (1 + np.exp(-x))
+    assert isinstance(res, np.ndarray) ,F"expected the res be of type np.ndarray but got {type(x)} "
+    return res
+
     # *** END CODE HERE ***
 
 def get_initial_params(input_size, num_hidden, num_output):
@@ -75,7 +83,7 @@ def get_initial_params(input_size, num_hidden, num_output):
     return param
     # *** END CODE HERE ***
 
-def forward_prop(data, labels, params):
+def forward_prop(data:np.ndarray, labels:np.ndarray, params:dict):
     """
     Implement the forward layer given the data, labels, and params.
     
@@ -94,19 +102,19 @@ def forward_prop(data, labels, params):
             3. The average loss for these data elements
     """
     # *** START CODE HERE ***
-    W1 = params['W1']
-    b1 = params['b1']
-    W2 = params['W2']
-    b2 = params['b2']
-    z1 = np.dot(data,W1) + b1
-    a1 = sigmoid(z1)
-    z2 = np.dot(a1,W2) + b2
-    a2 = softmax(z2)
-    celoss = np.sum(labels * np.log(a2)) * (- 1/data.shape[0])
-    return (a1, a2, celoss)
+    assert isinstance(data, np.ndarray) ,F"expected the data be of type np.ndarray but got {type(data)} "
+    assert isinstance(labels, np.ndarray) ,F"expected the labels be of type np.ndarray but got {type(labels)} "
+    z1 = np.dot(data,  params['W1']) + params['b1']
+    A1 = sigmoid(z1)
+    z2 = np.dot(A1,  params['W2']) + params['b2']
+    A2 = softmax(z2)
+    CELoss = np.sum(labels * np.log(A2)) * (-1/(data.shape[0]))
+    print(F"the CELOSS we got is {CELoss}")
+    return (A1,A2,CELoss)
     # *** END CODE HERE ***
 
-def backward_prop(data, labels, params, forward_prop_func):
+
+def backward_prop(data:np.ndarray, labels:np.ndarray, params, forward_prop_func):
     """
     Implement the backward propegation gradient computation step for a neural network
     
@@ -127,16 +135,23 @@ def backward_prop(data, labels, params, forward_prop_func):
             W1, W2, b1, and b2
     """
     # *** START CODE HERE ***
-    n = data.shape[0]
+    assert isinstance(data, np.ndarray) ,F"expected the data be of type np.ndarray but got {type(data)} "
+    assert isinstance(labels, np.ndarray) ,F"expected the labels be of type np.ndarray but got {type(labels)} "
+    num_of_eg = data.shape[0]
+    W1 = params['W1']
     W2 = params['W2']
-    (a1, a2, loss) = forward_prop_func(data, labels, params)
-    dz2 = a2-labels
-    dW2 = (1/n) * np.dot(a1.T, dz2)
+    (A1, A2, loss)=forward_prop_func(data, labels, params)
+    # A2 is softmax, labels is y
+    dz2 = A2 - labels
+    # dw2 = ( 1 / num_of_eg ) * np.dot(dz2.T , A1) 
+    dw2 = (1 / num_of_eg) * np.dot(A1.T, dz2)
     db2 = np.mean(dz2, axis=0, keepdims=True)
-    dz1 = np.dot(dz2, W2.T) * a1 * (1 - a1)
-    dW1 = (1/n) * np.dot(data.T, dz1)
+    dz1 = np.dot(dz2, W2.T) * A1 * (1 - A1)
     db1 = np.mean(dz1, axis=0, keepdims=True)
-    grads = {'dW1':dW1, 'dW2':dW2, 'db1':db1, 'db2':db2}
+    dW1 = (1/num_of_eg) * np.dot(data.T, dz1)
+    grads = {'dW1': dW1, 'dW2': dw2, 'db1': db1, 'db2': db2}
+    # print(F"the dz2 is {dz2} and it's type is {type(dz2)}")
+    print(F"the shape of dz2 is {dz2.shape} ++ in normal backprop")
     return grads
     # *** END CODE HERE ***
 
@@ -163,23 +178,26 @@ def backward_prop_regularized(data, labels, params, forward_prop_func, reg):
             W1, W2, b1, and b2
     """
     # *** START CODE HERE ***
-    n = data.shape[0]
-    W2 = params['W2']
+    assert isinstance(data, np.ndarray) ,F"expected the data be of type np.ndarray but got {type(data)} "
+    assert isinstance(labels, np.ndarray) ,F"expected the labels be of type np.ndarray but got {type(labels)} "
+    num_of_eg = data.shape[0]
     W1 = params['W1']
-    (a1, a2, loss) = forward_prop_func(data, labels, params)
-    dz2 = a2 - labels
-    # weight panelty
-    dW2 = (1 / n) * np.dot(a1.T, dz2) + reg * W2
+    W2 = params['W2']
+    (A1, A2, loss)=forward_prop_func(data, labels, params)
+    # A2 is softmax, labels is y
+    dz2 = A2 - labels
+    dw2 = ( 1 / num_of_eg ) * np.dot( A1.T, dz2) + reg * W2
     db2 = np.mean(dz2, axis=0, keepdims=True)
-    dz1 = np.dot(dz2, W2.T) * a1 * (1 - a1)
-    # weight panelty
-    dW1 = (1 / n) * np.dot(data.T, dz1) + reg * W1
+    dz1 = np.dot(dz2, W2.T) * A1 * (1 - A1)
     db1 = np.mean(dz1, axis=0, keepdims=True)
-    grads = {'dW1': dW1, 'dW2': dW2, 'db1': db1, 'db2': db2}
+    dW1 = (1/num_of_eg) * np.dot(data.T, dz1)
+    grads = {'dW1': dW1, 'dW2': dw2, 'db1': db1, 'db2': db2}
+    # print(F"the dz2 is {dz2} and it's type is {type(dz2)}")
+    print(F" -- the shape of dz2 is {dz2.shape} -- in the regularized back prop")
     return grads
     # *** END CODE HERE ***
 
-def gradient_descent_epoch(train_data, train_labels, learning_rate, batch_size, params, forward_prop_func, backward_prop_func):
+def gradient_descent_epoch(train_data:np.ndarray, train_labels:np.ndarray, learning_rate:float, batch_size, params:dict, forward_prop_func, backward_prop_func ):
     """
     Perform one epoch of gradient descent on the given training data using the provided learning rate.
 
@@ -199,11 +217,13 @@ def gradient_descent_epoch(train_data, train_labels, learning_rate, batch_size, 
     """
 
     # *** START CODE HERE ***
+    print(F' in the gradient_descent_epoch function  ')
     n = train_labels.shape[0]
     n_batch = n // batch_size
     n_last_batch = n % batch_size
     for i in range(n_batch):
         batch_index = range(i * batch_size, (i+1) * batch_size)
+        print(f"[INFO] ------------Processing Batch {i + 1}/{n_batch} (images {i*batch_size} to {(i+1)*batch_size}) ----------- ") # Add this line
         xbatch = train_data[batch_index]
         ybatch = train_labels[batch_index]
         grads = backward_prop_func(xbatch, ybatch, params, forward_prop_func)
@@ -225,17 +245,18 @@ def gradient_descent_epoch(train_data, train_labels, learning_rate, batch_size, 
 def nn_train(
     train_data, train_labels, dev_data, dev_labels, 
     get_initial_params_func, forward_prop_func, backward_prop_func,
-    num_hidden=300, learning_rate=5, num_epochs=30, batch_size=1000):
+    num_hidden_units=300, learning_rate=5, num_epochs=30, batch_size=1000):
 
     (nexp, dim) = train_data.shape
 
-    params = get_initial_params_func(dim, num_hidden, 10)
+    params = get_initial_params_func(dim, num_hidden_units, 10)
 
     cost_train = []
     cost_dev = []
     accuracy_train = []
     accuracy_dev = []
     for epoch in range(num_epochs):
+        print(f"[INFO] ------------Starting Epoch {epoch + 1}/{num_epochs} ---------") # Add this line
         gradient_descent_epoch(train_data, train_labels, 
             learning_rate, batch_size, params, forward_prop_func, backward_prop_func)
 
@@ -273,7 +294,7 @@ def run_train_test(name, all_data, all_labels, backward_prop_func, num_epochs, p
         all_data['train'], all_labels['train'], 
         all_data['dev'], all_labels['dev'],
         get_initial_params, forward_prop, backward_prop_func,
-        num_hidden=300, learning_rate=5, num_epochs=num_epochs, batch_size=1000
+        num_hidden_units=300, learning_rate=5, num_epochs=num_epochs, batch_size=1000
     )
 
     t = np.arange(num_epochs)
@@ -310,8 +331,9 @@ def main(plot=True):
 
     args = parser.parse_args()
 
-    np.random.seed(100)
+    np.random.seed(10100)
     train_data, train_labels = read_data('./images_train.csv', './labels_train.csv')
+    # print(F' going to calculate the one hot label {0} ')
     train_labels = one_hot_labels(train_labels)
     p = np.random.permutation(60000)
     train_data = train_data[p,:]
@@ -342,6 +364,7 @@ def main(plot=True):
         'dev': dev_labels,
         'test': test_labels,
     }
+    print(F"prepared the data and now we are going to train ")
     
     baseline_acc = run_train_test('baseline', all_data, all_labels, backward_prop, args.num_epochs, plot)
     reg_acc = run_train_test('regularized', all_data, all_labels, 
