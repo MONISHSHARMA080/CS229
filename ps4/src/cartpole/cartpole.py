@@ -7,6 +7,8 @@ from env import CartPole, Physics
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.signal import lfilter
+from helper import printType
+
 
 """
 Parts of the code (cart and pole dynamics, and the state
@@ -82,7 +84,10 @@ initial learning quickly, and start the display only after the
 performance is reasonable.
 """
 
-def initialize_mdp_data(num_states):
+
+
+
+def initialize_mdp_data(num_states:int)->dict[str, np.ndarray|int]:
     """
     Return a variable that contains all the parameters/state you need for your MDP.
     Feel free to use whatever data type is most convenient for you (custom classes, tuples, dicts, etc)
@@ -106,6 +111,7 @@ def initialize_mdp_data(num_states):
     reward = np.zeros(num_states)
     value = np.random.rand(num_states) * 0.1
 
+    
     return {
         'transition_counts': transition_counts,
         'transition_probs': transition_probs,
@@ -115,7 +121,7 @@ def initialize_mdp_data(num_states):
         'num_states': num_states,
     }
 
-def choose_action(state, mdp_data):
+def choose_action(state:int, mdp_data:dict):
     """
     Choose the next action (0 or 1) that is optimal according to your current
     mdp_data. When there is no optimal action, return a random action.
@@ -127,21 +133,30 @@ def choose_action(state, mdp_data):
     Returns:
         0 or 1 that is optimal according to your current MDP
     """
+    print(F' the mdp_data is of type {type(mdp_data)} ')
+    assert isinstance( mdp_data , dict ), F'the mdp_data is not of type dict it is {type(mdp_data)}'
+    print(F' the state in the choose action is {state} \nand the mdp_data is { mdp_data.keys()} ')
 
     # *** START CODE HERE ***
+    value = mdp_data["value"]
     psa = mdp_data['transition_probs']
-    value = mdp_data['value']
-    # average value of 0
-    v0 = np.sum(np.inner(psa[state,:,0],value))
-    # average value of 1
-    v1 = np.sum(np.inner(psa[state,:,1],value))
-    # make actions
-    if v0 > v1: return 0
-    elif v0 < v1: return 1
-    else: return np.random.randint(2)
+    assert isinstance(psa, np.ndarray) , F'expected the psa to be of type np.ndarray byt got {type(psa)} '
+    assert isinstance(value, np.ndarray) , F'expected value to be of type np.ndarray but got {type(value)} '
+    print(F' the PSA matrix is {psa.shape} and value is of shape {value.shape} ')
+    v0 = np.sum(np.inner(psa[state, :, 0], value))
+    v1 = np.sum(np.inner(psa[state, :, 1], value))
+    print(F' the V1 is {v1} and v0 is {v0} ')
+    if v1>v0:
+        return 1
+    elif v0>v1:
+        return 0
+    else: 
+      a = np.random.randint(2)
+      print(F' the random choice is {a} ')
+      return a
     # *** END CODE HERE ***
 
-def update_mdp_transition_counts_reward_counts(mdp_data, state, action, new_state, reward):
+def update_mdp_transition_counts_reward_counts(mdp_data:dict, state:int, action:int, new_state:float, reward:float):
     """
     Update the transition count and reward count information in your mdp_data. 
     Do not change the other MDP parameters (those get changed later).
@@ -161,23 +176,25 @@ def update_mdp_transition_counts_reward_counts(mdp_data, state, action, new_stat
     Returns:
         Nothing
     """
-
     # *** START CODE HERE ***
-    trans_count = mdp_data['transition_counts']
+    transition_counts = mdp_data['transition_counts']
     reward_count = mdp_data['reward_counts']
-    # update transition counts
-    trans_count[state, new_state, action] += 1
-    # update reward counts
-    reward_count[new_state, 1] += 1
+    assert isinstance( transition_counts , np.ndarray) , F'expected transition_counts be of type but got {type(transition_counts)} '
+    assert isinstance( reward_count , np.ndarray) , F'expected reward_counts be of type but got {type(reward_count)} '
+    # printType(mdp_data,state, action,new_state, reward, reward_counts, transition_counts)
+    # print(F' the reward_count is {transition_counts.shape} and reward_counts is {reward_count.shape} and new_state is {new_state} \n  actions is {action} the transition_counts is {transition_counts}')
+    # here if we reached this transition and we will update our tally
+    transition_counts[state, new_state, action] +=1
+    # here if the action is 1 on the 
+    reward_count[ new_state, 1] +=1
     reward_count[new_state, 0] += int(reward==-1)
-    mdp_data['transition_counts'] = trans_count
+    mdp_data['transition_counts'] = transition_counts
     mdp_data['reward_counts'] = reward_count
     # *** END CODE HERE ***
-
     # This function does not return anything
     return
 
-def update_mdp_transition_probs_reward(mdp_data):
+def update_mdp_transition_probs_reward(mdp_data:dict):
     """
     Update the estimated transition probabilities and reward values in your MDP.
 
@@ -192,25 +209,30 @@ def update_mdp_transition_probs_reward(mdp_data):
         Nothing
 
     """
-
     # *** START CODE HERE ***
-    trans_count = mdp_data['transition_counts']
-    trans_prob = mdp_data['transition_probs']
+    assert isinstance( mdp_data , dict ), F'the mdp_data is not of type dict it is {type(mdp_data)}'
+        # 'transition_counts': transition_counts,
+        # 'transition_probs': transition_probs,
+        # 'reward_counts': reward_counts,
+        # 'reward': reward,
+        # 'value': value,
+        # 'num_states': num_states,
+    transition_counts = mdp_data['transition_counts']
+    transition_probs = mdp_data['transition_probs']
     reward_count = mdp_data['reward_counts']
     num_states = mdp_data['num_states']
-    # update transition probability
+
     for state in range(num_states):
-        cs = np.sum(trans_count[state,:,:], axis=0)
-        if cs[0] > 0: trans_prob[state,:,0] = trans_count[state,:,0] / cs[0]
-        if cs[1] > 0: trans_prob[state,:,1] = trans_count[state,:,1] / cs[1]
-    mdp_data['transition_probs'] = trans_prob
+        cs = np.sum(transition_counts[state,:,:], axis=0)
+        if cs[0] > 0: transition_probs[state,:,0] = transition_counts[state,:,0] / cs[0]
+        if cs[1] > 0: transition_probs[state,:,1] = transition_counts[state,:,1] / cs[1]
+    mdp_data['transition_probs'] = transition_probs
     # update reward
     reward_list = mdp_data['reward']
     for state in range(num_states):
         if reward_count[state,1] > 0: reward_list[state] = - reward_count[state,0] / reward_count[state,1]
     mdp_data['reward'] = reward_list
     # *** END CODE HERE ***
-
     # This function does not return anything
     return
 
